@@ -1,0 +1,643 @@
+<include file="Public/header" />
+
+<div class="feeldesk-form ticket-form window-feeldesk-form">
+
+    <form action="{:U('ticket/cloning',['ticket_model_id'=>$ticket_model_id,'id'=>encrypt($ticket['ticket_id'],'TICKET')])}" class="layui-form" method="post" enctype="multipart/form-data">
+
+        <input type="hidden" name="ticket[ticket_model_id]" value="{$template['ticket_model_id']}"/>
+
+        <div class="form-content">
+
+            <div class="form-item">
+
+                <!-- 主题 -->
+                <div class="layui-form-item">
+
+                    <label class="layui-form-label">{:L('TICKET_TITLE')}</label>
+
+                    <div class="layui-input-inline">
+
+                        <input type="text" name="ticket[title]" value='{$ticket.title}' placeholder="{:L('ENTER_TICKET_TITLE')}" class="layui-input">
+
+                    </div>
+
+                </div>
+
+                <!-- 优先级 -->
+                <div class="layui-form-item">
+
+                    <label class="layui-form-label">{:L('PRIORITY')}</label>
+
+                    <div class="layui-input-inline">
+
+                        <select name="ticket[priority]">
+
+                            <?php foreach($ticketObj->getPriority() as $k=>$v){?>
+
+                            <option value="<?php echo $k?>" <php>if($k == $ticket['priority']){echo 'selected';}</php>><?php echo $v?></option>
+
+                            <?php }?>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <eq name="template.mobile_discrete" value="10">
+
+                    <div class="layui-form-item">
+
+                        <label class="layui-form-label">{:L('MOBILE')}</label>
+
+                        <div class="layui-input-inline">
+
+                            <input type="number" name="ticket[mobile]" value='{$ticket.mobile_discrete}' placeholder="{:L('ENTER_MOBILE')}" class="layui-input" autocomplete="off">
+
+                        </div>
+
+                    </div>
+
+                </eq>
+
+                <eq name="template.mail_discrete" value="10">
+
+                    <div class="layui-form-item">
+
+                        <label class="layui-form-label">{:L('EMAIL')}</label>
+
+                        <div class="layui-input-inline">
+
+                            <input type="text" name="ticket[email]" value='{$ticket.mail_discrete}' placeholder="{:L('ENTER_EMAIL')}" class="layui-input">
+
+                        </div>
+
+                    </div>
+
+                </eq>
+
+                <eq name="template.cc_discrete" value="10">
+
+                    <!-- 抄送人 -->
+                    <div class="layui-form-item">
+
+                        <label class="layui-form-label">{:L('CC_PERSON')}</label>
+
+                        <div class="layui-input-inline" id="ccPerson"></div>
+
+                    </div>
+
+                </eq>
+
+                <php>$textareaNo = 1;</php>
+
+                <volist name="cloneTicketFormData.ticketForm" id="vo">
+
+                    <div class="layui-form-item">
+
+                        <label class="layui-form-label">
+
+                            <eq name="vo.is_required" value="0"><span class="red">*</span> </eq>
+
+                            {$vo.ticket_form_description}
+
+                        </label>
+
+                        <div class="layui-input-inline">
+
+                            <eq name="vo.ticket_form_type" value="text">
+
+                                <!-- 单行文本框 -->
+                                <input type="text" name="ticket_form[{$vo.ticket_form_name}]" value="{$vo.ticket_form_content}" placeholder="" class="layui-input">
+
+                            </eq>
+
+                            <eq name="vo.ticket_form_type" value="select">
+
+                                <!-- 下拉菜单 -->
+                                <select name="ticket_form[{$vo.ticket_form_name}]">
+
+                                    <option value="">{$vo.ticket_form_description}</option>
+
+                                    <foreach name="vo.option" item="op">
+
+                                        <option value="{$op}" <eq name="vo.ticket_form_content" value="$op">selected</eq>>{$op}</option>
+
+                                    </foreach>
+
+                                </select>
+
+                            </eq>
+
+                            <!-- 时间控件 -->
+                            <eq name="vo.ticket_form_type" value="date">
+
+                                <input type='text' name="ticket_form[{$vo.ticket_form_name}]" value='{$vo.ticket_form_content}' class="layui-input cursor" id="datetime{$i}" placeholder="{:L('SELECT_TIME')}" >
+
+                                <script type="text/javascript">
+
+                                    layui.use('laydate',function()
+                                    {
+                                        var laydate = layui.laydate;
+
+                                        var option = {
+                                            elem:'#datetime{$i}',
+                                            type:'datetime',
+                                            format: 'yyyy-MM-dd HH:mm',
+                                            trigger: 'click',
+                                            btns: ['clear', 'confirm']
+                                        };
+
+                                        laydate.render(option);
+                                    })
+
+                                </script>
+
+                            </eq>
+
+                            <eq name="vo.ticket_form_type" value="checkbox">
+
+                                <!-- 复选框 -->
+                                <volist name="vo.option" id="op">
+
+                                    <input type="checkbox" name="ticket_form[{$vo.ticket_form_name}][]" lay-skin="primary" title="{$op}" value="{$op}" <in name="op" value="$vo['ticket_form_content']">checked</in>>
+
+                                </volist>
+
+                            </eq>
+
+                            <eq name="vo.ticket_form_type" value="radio">
+
+                                <!-- 单选框-->
+                                <volist name="vo.option" id="op">
+
+                                    <input type="radio" name="ticket_form[{$vo.ticket_form_name}]" value="{$op}" title="{$op}" <eq name="op" value="$vo['ticket_form_content']">checked</eq>>
+
+                                </volist>
+
+                            </eq>
+
+                            <!-- 文本域 -->
+                            <eq name="vo.ticket_form_type" value="textarea">
+
+                                <textarea class="layui-textarea layui-hide ticket-textarea" name="ticket_form[{$vo.ticket_form_name}]" id="ticketEditor{$textareaNo++}">{$vo['ticket_form_content']}</textarea>
+
+                            </eq>
+
+                        </div>
+
+                        <notempty name="vo.ticket_form_explain">
+
+                            <i class="layui-icon layui-icon-about intro-icon" data-note="{$vo.ticket_form_explain}"></i>
+
+                        </notempty>
+
+                    </div>
+
+                </volist>
+
+                <eq name="template.handle_discrete" value="10">
+
+                    <!-- 指定处理人 - 选择部门-->
+                    <div class="layui-form-item">
+
+                        <label class="layui-form-label">{:L('SELECT_DISPOSE')}</label>
+
+                        <div class="layui-input-inline wd30">
+
+                            <select name="ticket[group_id]" lay-filter="handle-group" lay-search>
+
+                                <option value="">{:L('SELECT_SECTOR')}</option>
+
+                                <volist name="cloneTicketFormData.groups" id="vo">
+
+                                    <option value="{$vo.group_id}" <eq name="vo.group_id" value="$ticket['group_id']">selected</eq>>{$vo.group_name}</option>
+
+                                </volist>
+
+                            </select>
+
+                        </div>
+
+                        <div class="layui-input-inline wd30 layui-form" style="width: calc(30% - 10px) !important;" lay-filter="handle-person">
+
+                            <select name="ticket[handle_discrete]" lay-search id="handle-discrete">
+
+                                <option value="">{:L('SELECT_DISPOSE')}</option>
+
+                                <volist name="cloneTicketFormData.members" id="vo">
+
+                                    <in name="ticket.group_id" value="$vo['group_id']">
+
+                                        <option value="{$vo.member_id}" <eq name="vo.member_id" value="$ticket['dispose_id']">selected</eq>>{$vo.name}</option>
+
+                                    </in>
+
+                                </volist>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </eq>
+
+                <eq name="template.deadlines_discrete" value="10">
+
+                    <!-- 完成期限组件 -->
+                    <div class="layui-form-item">
+
+                        <label class="layui-form-label">{:L('DEADLINES_COMPONENTS')}</label>
+
+                        <div class="layui-input-inline">
+
+                            <input type='text' name="deadlines" class="layui-input cursor" value="{:getDates($ticket['deadline'])}" id="deadlines" placeholder="{:L('EXPECT_TIME')}" >
+
+                        </div>
+
+                    </div>
+
+                    <script type="text/javascript">
+
+                        layui.use('laydate',function()
+                        {
+                            var datetime = layui.laydate;
+
+                            var option = {
+                                elem:'#deadlines',
+                                type:'datetime',
+                                format: 'yyyy-MM-dd HH:mm',
+                                min: "{:getDates($ticket['deadline'],5)}",
+                                trigger: 'click',
+                                btns: ['clear', 'confirm']
+                            };
+
+                            datetime.render(option);
+                        })
+
+                    </script>
+
+                </eq>
+
+                <eq name="template.area_discrete" value="10">
+
+                    <!-- 区域组件 -->
+                    <div class="layui-form-item">
+
+                        <label class="layui-form-label">{:L('SELECT_AREA')}</label>
+
+                        <div class="layui-input-inline wd30" style="width: calc(21% - 10px) !important;">
+
+                            <select name="area[country_code]" lay-filter="select-country" lay-search>
+
+                                <option value="">{:L('SELECT_COUNTRY')}</option>
+
+                                <volist name="cloneTicketFormData.area.country" id="vo">
+
+                                    <option value="{$vo.code}" <eq name='cloneTicketFormData.ticketArea.country_code' value="$vo['code']">selected</eq>>{$vo.lang_name}</option>
+
+                                </volist>
+
+                            </select>
+
+                        </div>
+
+                        <div class="layui-input-inline wd30 layui-form <empty name='cloneTicketFormData.ticketArea.province_code'>hidden</empty>" style="width: calc(20% - 10px) !important;" lay-filter="province">
+
+                            <select name="area[province_code]" lay-search id="province" lay-filter="select-province">
+
+                                <option value="">{:L('SELECT_PROVINCE')}</option>
+
+                                <if condition="$cloneTicketFormData['ticketArea']['province_code']">
+
+                                    <volist name="cloneTicketFormData.area.province" id="vo">
+
+                                        <if condition="$cloneTicketFormData['ticketArea']['country_code'] eq $vo['country_code']">
+
+                                            <if condition="$cloneTicketFormData['ticketArea']['province_code'] eq $vo['code']">
+
+                                                <option value="{$vo.code}" selected>{$vo.lang_name}</option>
+
+                                                <else />
+
+                                                <option value="{$vo.code}">{$vo.lang_name}</option>
+
+                                            </if>
+
+                                        </if>
+
+                                    </volist>
+
+                                </if>
+
+                            </select>
+
+                        </div>
+
+                        <div class="layui-input-inline wd30 layui-form <empty name='cloneTicketFormData.ticketArea.city_code'>hidden</empty>" style="width: calc(20% - 10px) !important;" lay-filter="city">
+
+                            <select name="area[city_code]" lay-search id="city" lay-filter="select-city">
+
+                                <option value="">{:L('SELECT_CITY')}</option>
+
+                                <if condition="$cloneTicketFormData['ticketArea']['city_code']">
+
+                                    <volist name="cloneTicketFormData.area.city" id="vo">
+
+                                        <if condition="$cloneTicketFormData['ticketArea']['country_code'] eq $vo['country_code'] && $cloneTicketFormData['ticketArea']['province_code'] eq  $vo['province_code']">
+
+                                            <if condition="$cloneTicketFormData['ticketArea']['city_code'] eq $vo['code']">
+
+                                                <option value="{$vo.code}" selected>{$vo.lang_name}</option>
+
+                                                <else />
+
+                                                <option value="{$vo.code}">{$vo.lang_name}</option>
+
+                                            </if>
+
+                                        </if>
+
+                                    </volist>
+
+                                </if>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                    <script type="text/javascript">
+
+                        $(function()
+                        {
+                            layui.use('form',function()
+                            {
+                                var form = layui.form;
+
+                                var countryId = "{$cloneTicketFormData['ticketArea']['country_code']}";
+
+                                form.on('select(select-country)',function(data)
+                                {
+                                    var value = countryId = data.value;
+
+                                    $.post("{:U('Create')}?id={:encrypt($template['ticket_model_id'],'modelID')}",
+                                        {request:'area',type:'province',country_id:value},
+                                        function(data)
+                                        {
+                                            var option = "<option value=''>{:L('SELECT_PROVINCE')}</option>";
+
+                                            if(data.code == 0)
+                                            {
+                                                if(data.data.length > 0)
+                                                {
+                                                    $.each(data.data,function(k,v)
+                                                    {
+                                                        option += "<option value='"+ v.code +"'>"+ v.lang_name +"</option>";
+                                                    });
+
+                                                    $('#province').html(option).parent('.layui-input-inline').removeClass('hidden');
+
+                                                }
+                                                else
+                                                {
+                                                    $('#province').html(option).parent('.layui-input-inline').addClass('hidden');
+                                                }
+
+                                                form.render('select','province');
+                                            }
+
+                                            $('#city').html("<option value=''>{:L('SELECT_CITY')}</option>").parent('.layui-input-inline').addClass('hidden');
+
+                                            form.render('select','city');
+                                        })
+                                });
+
+                                form.on('select(select-province)',function(data)
+                                {
+                                    var value = data.value;
+
+                                    $.post("{:U('Create')}?id={:encrypt($template['ticket_model_id'],'modelID')}",
+                                        {request:'area',type:'city',province_id:value,country_id:countryId}, function(data)
+                                        {
+                                            var option = "<option value=''>{:L('SELECT_CITY')}</option>";
+
+                                            if(data.code == 0)
+                                            {
+                                                if(data.data.length > 0)
+                                                {
+                                                    $.each(data.data,function(k,v)
+                                                    {
+                                                        option += "<option value='"+ v.code +"'>"+ v.lang_name +"</option>";
+                                                    });
+
+                                                    $('#city').html(option).parent('.layui-input-inline').removeClass('hidden');
+                                                }
+                                                else
+                                                {
+                                                    $('#city').html(option).parent('.layui-input-inline').addClass('hidden');
+                                                }
+
+                                                form.render('select','city');
+                                            }
+                                        })
+                                })
+                            })
+                        })
+
+                    </script>
+
+                </eq>
+
+                <!-- 图片上传 -->
+                <div class="layui-form-item relative">
+
+                    <label class="layui-form-label"></label>
+
+                    <div class="layui-input-inline flex flex-wrap mr0" id="imageNames">
+
+                        <volist name="ticket.photo" id="vo">
+
+                            <php>$m = ($i)%3;</php>
+
+                            <div class="layui-upload-drag <eq name='m' value='0'>mr0</eq>">
+
+                                <img src="{$vo}"  alt=""/>
+
+                                <a href="javascript:void(0);" class="image-cancel" onclick="editTicketDeleteImage(this);" data-name="{:getImageName('http://'.$ticket['qiniu_domain'].'/',$vo)}" title="{:L('DELETE_PICTURE')}">X</a>
+
+                                <input type="hidden" name="photo[]" value="{$vo}">
+
+                            </div>
+
+                        </volist>
+
+                        <div class="layui-upload-drag uploadImg mr0">
+
+                            <div>
+
+                                <i class="layui-icon"></i>
+
+                                <p>{:L('UPLOAD_PICTURES')}</p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- 附件上传 -->
+                <div class="layui-form-item relative">
+
+                    <label class="layui-form-label">{:L('UPLOAD_ATTACHMENTS')}</label>
+
+                    <div class="layui-input-inline">
+
+                        <button type="button" class="layui-btn layui-btn-primary" id="uploadFile"><i class="layui-icon"></i>{:L('UPLOAD_ATTACHMENTS')}</button>
+
+                        <ul id="attachments" class="attach-item mt10">
+
+                            <volist name="ticket.createFiles" id="vo">
+
+                                <li>
+
+                                    <i class="iconfont icon-fujian"></i>
+
+                                    <span>{$vo['file_name']}</span>
+
+                                    <span class="iconfont icon-close2 closed cursor" data-name="{$vo['save_name']}" onclick="editTicketDeleteFile(this);"></span>
+
+                                    <input type="hidden" name="file[saves][]" value="{$vo['save_name']}">
+
+                                    <input type="hidden" name="file[names][]" value="{$vo['file_name']}">
+
+                                    <input type="hidden" name="file[sizes][]" value="{$vo['file_size']}">
+
+                                    <input type="hidden" name="file[types][]" value="{$vo['file_type']}">
+
+                                    <input type="hidden" name="file[links][]" value="{$vo['file_link']}">
+
+                                </li>
+
+                            </volist>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="form-submit">
+
+                <div class="layui-form-item">
+
+                    <div class="layui-input-inline">
+
+                        <a href="javascript:" class="layui-btn layui-btn-normal" id="submitForm">{:L('SUBMIT')}</a>
+
+                        <a href="javascript:" class="layui-btn layui-btn-normal cancel-btn" id="window-feeldesk-form-cancel">{:L('CANCEL')}</a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+    <script type="text/javascript">
+
+        function editTicketDeleteImage(obj)
+        {
+            var imageName =$(obj).data('name');
+
+            $('#imageNames').append("<input type='hidden' name='delImage[]' value="+imageName+">");
+
+            $(obj).parent().remove();
+        }
+
+        function editTicketDeleteFile(obj)
+        {
+            var fileName =$(obj).data('name');
+
+            $('#attachments').append("<input type='hidden' name='delFile[]' value='"+fileName+"'>");
+
+            $(obj).parent().remove();
+        }
+
+    </script>
+
+</div>
+
+<include file="Public:language" />
+
+<script type="text/javascript">
+
+    layui.config({
+        base : '__PUBLIC__/js/layui/extends/'
+    }).extend({
+        selectM: 'selectM'
+    }).use(['form','selectM'],function()
+    {
+        var form = layui.form;
+
+        var ccData = JSON.parse('{$cloneTicketFormData.jsonCcMembers}');
+
+        if($('#ccPerson').length)
+        {
+            //选择抄送人
+
+            var ccIds = JSON.parse('{$ticket["ccIds"]|default="[]"}');
+
+            layui.selectM(
+            {
+                elem: '#ccPerson',
+                data: ccData,
+                selected: ccIds,
+                tips:"{:L('SELECT_CC')}",
+                width:'60%',
+                name:'cc',
+                max:100,
+                search:true,
+                searchTips:"{:L('PLEASE_ENTER_KEYWORDS')}",
+                field: {idName:'member_id',titleName:'name',statusName:'status'}
+            });
+        }
+
+        var handleDiscrete = "{$template['handle_discrete']}";
+
+        if(handleDiscrete === 10)
+        {
+//            选择处理人
+            form.on("select(handle-group)",function(data)
+            {
+                var group_id = data.value;
+
+                var option = "<option value=''>{:L('SELECT_DISPOSE')}</option>";
+
+                $.each(ccData,function (k,v)
+                {
+                    var groupId = v.group_id.split(',');
+
+                    if($.inArray(group_id,groupId) !== -1)
+                    {
+                        option += "<option value="+v.member_id+">"+v.name+"</option>";
+                    }
+                });
+
+                $('#handle-discrete').html(option);
+
+                form.render('select','handle-person');
+            })
+        }
+    });
+
+</script>

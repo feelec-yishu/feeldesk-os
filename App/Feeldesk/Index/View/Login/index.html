@@ -1,0 +1,65 @@
+<include file="Login/header" />
+
+<div id='web' class="login-wrapper user-wrapper hidden">
+
+    <div class="header"><!--<img src="INDEX_IMG/login-logo.png" alt="">--></div>
+
+    <div class="user-main">
+
+        <div class="user-crumb"><img src="INDEX_IMG/feeldesk.png" alt=""></div>
+
+        <div class="user-form ">
+
+            <form action="" id="login-form">
+
+                <div class="user-form-item">
+
+                    <i class="iconfont icon-username"></i>
+
+                    <input type="text" name="data[username]" value="{$login.username}" placeholder="{:L('USERNAME_NOTE')}" id='username' autocomplete="off">
+
+                </div>
+
+                <div class="user-form-item">
+
+                    <i class="iconfont icon-password"></i>
+
+                    <input type="password" name="data[password]" value="{$login.password}" placeholder="{:L('ENTER_PASSWORD')}" id='password' autocomplete="off">
+
+                </div>
+
+                <div class="user-form-item"><div class="slide-verify" id="slide-verify"></div></div>
+
+                <div class="user-form-item layui-form">
+
+                    <input type="checkbox" name="data[remember]" lay-skin="primary" title="{:L('REMEMBER_PASSWORD')}" <eq name="login.remember" value="on">checked</eq>>
+
+                </div>
+
+                <div class="user-form-item"><a href="javascript:login()" class="submit-btn">{:L('LOGIN')}</a></div>
+
+                <div class="user-form-item clearfix">
+
+                    <a href="/u-reset" class="fr">{:L('FORGOT')}?</a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+    <!-- 开源版本需保留版权信息，请谨慎删除；推荐购买商业授权，支持正版 -->
+    <include file="Public/beian" />
+</div>
+
+<script>
+
+    $(function ()
+    {
+        $('#web').removeClass('hidden');
+
+        loadSlideVerify();
+    })
+
+</script>

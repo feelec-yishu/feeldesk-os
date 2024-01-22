@@ -1,0 +1,608 @@
+<extend name="Public:common"/>
+
+<block name="crumb1">{:L('TICKET_MANAGER')}</block>
+
+<block name="crumb2">{:L('CREATE_TICKET')}</block>
+
+<block name="crumb3"><i class="layui-icon">&#xe623;</i><a class="black6"><cite></cite></a>{$template['lang_name']}</block>
+
+<block name="content">
+
+    <div class="feeldesk-form ticket-form">
+
+        <form action="{:U('ticket/create',['id'=>encrypt($template['ticket_model_id'],'modelID')])}" class="layui-form" method="post" enctype="multipart/form-data">
+
+            <input type="hidden" name="ticket[ticket_model_id]" value="{$template['ticket_model_id']}"/>
+
+            <div class="form-content">
+
+                <div class="form-item">
+
+                    <!-- 主题 -->
+                    <div class="layui-form-item">
+
+                        <label class="layui-form-label">{:L('TICKET_TITLE')}</label>
+
+                        <div class="layui-input-inline">
+
+                            <input type="text" name="ticket[title]" placeholder="{:L('ENTER_TICKET_TITLE')}" class="layui-input">
+
+                        </div>
+
+                    </div>
+
+                    <!-- 优先级 -->
+                    <div class="layui-form-item">
+
+                        <label class="layui-form-label">{:L('PRIORITY')}</label>
+
+                        <div class="layui-input-inline">
+
+                            <select name="ticket[priority]">
+
+                                <?php foreach($ticketObj->getPriority() as $k=>$v){?>
+
+                                    <option value="<?php echo $k?>"><?php echo $v?></option>
+
+                                <?php }?>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                    <eq name="template.mobile_discrete" value="10">
+
+                        <div class="layui-form-item">
+
+                            <label class="layui-form-label">{:L('MOBILE')}</label>
+
+                            <div class="layui-input-inline">
+
+                                <input type="number" name="ticket[mobile]" placeholder="{:L('ENTER_MOBILE')}" class="layui-input">
+
+                            </div>
+
+                        </div>
+
+                    </eq>
+
+                    <eq name="template.mail_discrete" value="10">
+
+                        <div class="layui-form-item">
+
+                            <label class="layui-form-label">{:L('EMAIL')}</label>
+
+                            <div class="layui-input-inline">
+
+                                <input type="text" name="ticket[email]" placeholder="{:L('ENTER_EMAIL')}" class="layui-input">
+
+                            </div>
+
+                        </div>
+
+                    </eq>
+
+                    <eq name="template.cc_discrete" value="10">
+
+                        <!-- 抄送人 -->
+                        <div class="layui-form-item">
+
+                            <label class="layui-form-label">{:L('CC_PERSON')}</label>
+
+                            <div class="layui-input-inline" id="ccPerson"></div>
+
+                        </div>
+
+                    </eq>
+
+                    <php>$textareaNo = 1;</php>
+
+                    <volist name="createTicketFormData.ticketForm" id="vo">
+
+                        <div class="layui-form-item">
+
+                            <label class="layui-form-label">
+
+                                <eq name="vo.is_required" value="0"><span class="red">*</span> </eq>
+
+                                {$vo.ticket_form_description}
+
+                            </label>
+
+                            <div class="layui-input-inline">
+
+                                <eq name="vo.ticket_form_type" value="text">
+
+                                    <!-- 单行文本框 -->
+                                    <input type="text" name="ticket_form[{$vo.ticket_form_name}]" placeholder="" class="layui-input">
+
+                                </eq>
+
+                                <eq name="vo.ticket_form_type" value="select">
+
+                                    <!-- 下拉菜单 -->
+                                    <select name="ticket_form[{$vo.ticket_form_name}]" lay-search>
+
+                                        <option value="">{$vo.ticket_form_description}</option>
+
+                                        <foreach name="vo.option" item="op">
+
+                                            <option value="{$op}">{$op}</option>
+
+                                        </foreach>
+
+                                    </select>
+
+                                </eq>
+
+                                <!-- 时间控件 -->
+                                <eq name="vo.ticket_form_type" value="date">
+
+                                    <input type='text' name="ticket_form[{$vo.ticket_form_name}]" class="layui-input cursor" id="{$vo['ticket_form_name']}" placeholder="{:L('SELECT_TIME')}" >
+
+                                    <script type="text/javascript">
+
+                                        layui.use('laydate',function()
+                                        {
+                                            var laydate = layui.laydate;
+
+                                            var option = {
+                                                elem:"#{$vo['ticket_form_name']}",
+                                                type:'datetime',
+                                                format: 'yyyy-MM-dd HH:mm',
+                                                trigger: 'click',
+                                                btns: ['clear', 'confirm']
+                                            };
+
+                                            laydate.render(option);
+                                        })
+
+                                    </script>
+
+                                </eq>
+
+                                <eq name="vo.ticket_form_type" value="checkbox">
+
+                                    <!-- 复选框 -->
+                                    <volist name="vo.option" id="op">
+
+                                        <input type="checkbox" name="ticket_form[{$vo.ticket_form_name}][]" lay-skin="primary" title="{$op}" value="{$op}">
+
+                                    </volist>
+
+                                </eq>
+
+                                <eq name="vo.ticket_form_type" value="radio">
+
+                                    <!-- 单选框-->
+                                    <volist name="vo.option" id="op">
+
+                                        <input type="radio" name="ticket_form[{$vo.ticket_form_name}]" value="{$op}" title="{$op}">
+
+                                    </volist>
+
+                                </eq>
+
+                                <!-- 文本域 -->
+                                <eq name="vo.ticket_form_type" value="textarea">
+
+                                    <textarea class="layui-textarea layui-hide ticket-textarea" name="ticket_form[{$vo.ticket_form_name}]" id="ticketEditor{$textareaNo++}"></textarea>
+
+                                </eq>
+
+                            </div>
+
+                            <notempty name="vo.ticket_form_explain">
+
+                                <i class="layui-icon layui-icon-about intro-icon" data-note="{$vo.ticket_form_explain}"></i>
+
+                            </notempty>
+
+                        </div>
+
+                    </volist>
+
+                    <eq name="template.handle_discrete" value="10">
+
+                        <!-- 指定处理人 - 选择部门-->
+                        <div class="layui-form-item">
+
+                            <label class="layui-form-label">{:L('SELECT_DISPOSE')}</label>
+
+                            <div class="layui-input-inline wd30">
+
+                                <select name="ticket[group_id]" lay-filter="handle-group" lay-search>
+
+                                    <option value="">{:L('SELECT_SECTOR')}</option>
+
+                                    <volist name="createTicketFormData.groups" id="vo">
+
+                                        <option value="{$vo.group_id}">{$vo.group_name}</option>
+
+                                    </volist>
+
+                                </select>
+
+                            </div>
+
+                            <div class="layui-input-inline wd30 layui-form" style="width: calc(30% - 10px) !important;" lay-filter="handle-person">
+
+                                <select name="ticket[handle_discrete]" lay-search id="handle-discrete">
+
+                                    <option value="">{:L('SELECT_DISPOSE')}</option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                    </eq>
+
+                    <eq name="template.audit_discrete" value="10">
+
+                        <!-- 指定审核对象 - 人员或流程-->
+                        <div class="layui-form-item">
+
+                            <label class="layui-form-label">{:L('AUDIT')}</label>
+
+                            <div class="layui-input-inline wd30">
+
+                                <select name="ticket[audit_object]" lay-filter="audit-object">
+
+                                    <option value="">{:L('SELECT_AUDIT_OBJECT')}</option>
+
+                                    <option value="10">{:L('AUDITOR')}</option>
+
+                                    <option value="20">{:L('AUDIT_PROCESS')}</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="layui-input-inline wd30 layui-form" style="width: calc(30% - 10px) !important;" lay-filter="audit">
+
+                                <select name="ticket[audit_discrete]" lay-search id="audit">
+
+                                    <option value="">{:L('AUDITOR_OBJECT')}</option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                    </eq>
+
+                    <eq name="template.deadlines_discrete" value="10">
+
+                        <!-- 完成期限 -->
+                        <div class="layui-form-item">
+
+                            <label class="layui-form-label">{:L('DEADLINES_COMPONENTS')}</label>
+
+                            <div class="layui-input-inline">
+
+                                <input type='text' name="deadlines" class="layui-input cursor" id="deadlines" placeholder="{:L('EXPECT_TIME')}" >
+
+                            </div>
+
+                        </div>
+
+                        <script type="text/javascript">
+
+                            layui.use('laydate',function()
+                            {
+                                var datetime = layui.laydate;
+
+                                var option = {
+                                    elem:'#deadlines',
+									lang:language.LANG,
+                                    type:'datetime',
+                                    format: 'yyyy-MM-dd HH:mm',
+                                    min: '{:getDates(NOW_TIME,5)}',
+                                    trigger: 'click',
+                                    btns: ['clear', 'confirm']
+                                };
+
+                                datetime.render(option);
+                            })
+
+                        </script>
+
+                    </eq>
+
+                    <eq name="template.area_discrete" value="10">
+
+                        <!-- 区域 -->
+                        <div class="layui-form-item">
+
+                            <label class="layui-form-label">{:L('SELECT_AREA')}</label>
+
+                            <div class="layui-input-inline wd30" style="width: calc(21% - 10px) !important;">
+
+                                <select name="area[country_code]" lay-filter="select-country" lay-search>
+
+                                    <option value="">{:L('SELECT_COUNTRY')}</option>
+
+                                    <volist name="createTicketFormData.country" id="vo">
+
+                                        <option value="{$vo.code}">{$vo.lang_name}</option>
+
+                                    </volist>
+
+                                </select>
+
+                            </div>
+
+                            <div class="layui-input-inline wd30 layui-form hidden" style="width: calc(20% - 10px) !important;" lay-filter="province">
+
+                                <select name="area[province_code]" lay-search id="province" lay-filter="select-province">
+
+                                    <option value="">{:L('SELECT_PROVINCE')}</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="layui-input-inline wd30 layui-form hidden" style="width: calc(20% - 10px) !important;" lay-filter="city">
+
+                                <select name="area[city_code]" lay-search id="city" lay-filter="select-city">
+
+                                    <option value="">{:L('SELECT_CITY')}</option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                        <script type="text/javascript">
+
+                            $(function()
+                            {
+                                layui.use('form',function()
+                                {
+                                    var form = layui.form;
+
+                                    var countryId = '';
+
+                                    form.on('select(select-country)',function(data)
+                                    {
+                                        var value = countryId = data.value;
+
+                                        $.post("{:U('Create')}?id={:encrypt($template['ticket_model_id'],'modelID')}",
+                                            {request:'area',type:'province',country_id:value},
+                                            function(data)
+                                            {
+                                                var option = "<option value=''>{:L('SELECT_PROVINCE')}</option>";
+
+                                                if(data.code == 0)
+                                                {
+                                                    if(data.data.length > 0)
+                                                    {
+                                                        $.each(data.data,function(k,v)
+                                                        {
+                                                            option += "<option value='"+ v.code +"'>"+ v.lang_name +"</option>";
+                                                        });
+
+                                                        $('#province').html(option).parent('.layui-input-inline').removeClass('hidden');
+
+                                                    }
+                                                    else
+                                                    {
+                                                        $('#province').html(option).parent('.layui-input-inline').addClass('hidden');
+                                                    }
+
+                                                    form.render('select','province');
+                                                }
+
+                                                $('#city').html("<option value=''>{:L('SELECT_CITY')}</option>").parent('.layui-input-inline').addClass('hidden');
+
+                                                form.render('select','city');
+                                            })
+                                    });
+
+                                    form.on('select(select-province)',function(data)
+                                    {
+                                        var value = data.value;
+
+                                        $.post("{:U('Create')}?id={:encrypt($template['ticket_model_id'],'modelID')}",
+                                            {request:'area',type:'city',province_id:value,country_id:countryId}, function(data)
+                                            {
+                                                var option = "<option value=''>{:L('SELECT_CITY')}</option>";
+
+                                                if(data.code == 0)
+                                                {
+                                                    if(data.data.length > 0)
+                                                    {
+                                                        $.each(data.data,function(k,v)
+                                                        {
+                                                            option += "<option value='"+ v.code +"'>"+ v.lang_name +"</option>";
+                                                        });
+
+                                                        $('#city').html(option).parent('.layui-input-inline').removeClass('hidden');
+                                                    }
+                                                    else
+                                                    {
+                                                        $('#city').html(option).parent('.layui-input-inline').addClass('hidden');
+                                                    }
+
+                                                    form.render('select','city');
+                                                }
+                                            })
+                                    })
+                                })
+                            })
+
+                        </script>
+
+                    </eq>
+
+                    <!-- 图片上传 -->
+                    <div class="layui-form-item relative">
+
+                        <label class="layui-form-label"></label>
+
+                        <div class="layui-input-inline flex flex-wrap">
+
+                            <div class="layui-upload-drag uploadImg mr0">
+
+                                <div>
+
+                                    <i class="layui-icon"></i>
+
+                                    <p>{:L('UPLOAD_PICTURES')}</p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- 附件上传 -->
+                    <div class="layui-form-item relative">
+
+                        <label class="layui-form-label">{:L('UPLOAD_ATTACHMENTS')}</label>
+
+                        <div class="layui-input-inline">
+
+                            <button type="button" class="layui-btn layui-btn-primary" id="uploadFile"><i class="layui-icon"></i>{:L('UPLOAD_ATTACHMENTS')}</button>
+
+                            <ul id="attachments" class="attach-item mt10"></ul>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="form-submit">
+
+                    <div class="layui-form-item">
+
+                        <div class="layui-input-inline">
+
+                            <a href="javascript:" class="layui-btn layui-btn-normal" id="submitForm">{:L('SUBMIT')}</a>
+
+                            <a href="javascript:history.go(-1)" class="layui-btn layui-btn-normal cancel-btn">{:L('CANCEL')}</a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    <include file="Public:language" />
+
+    <script type="text/javascript">
+
+        layui.config({
+            base : '__PUBLIC__/js/layui/extends/'
+        }).extend({
+            selectM: 'selectM'
+        }).use(['form','selectM'],function()
+        {
+            var form = layui.form;
+
+            var ccData = JSON.parse('{$createTicketFormData.jsonCcMembers}');
+
+            if($('#ccPerson').length)
+            {
+                //选择抄送人
+                layui.selectM(
+                {
+                    elem: '#ccPerson',
+                    data: ccData,
+                    tips:"{:L('SELECT_CC')}",
+                    width:'60%',
+                    name:'cc',
+                    max:100,
+                    search:true,
+                    searchTips:"{:L('PLEASE_ENTER_KEYWORDS')}",
+                    field: {idName:'member_id',titleName:'name',statusName:'status'}
+                });
+            }
+
+            var handleDiscrete = "{$template['handle_discrete']}";
+
+            if(handleDiscrete == 10)
+            {
+//                选择处理人
+                form.on("select(handle-group)",function(data)
+                {
+                    var group_id = data.value;
+
+                    var option = "<option value=''>{:L('SELECT_DISPOSE')}</option>";
+
+                    $.each(ccData,function (k,v)
+                    {
+                        var groupId = v.group_id.split(',');
+
+                        if($.inArray(group_id,groupId) != -1)
+                        {
+                            option += "<option value="+v.member_id+">"+v.name+"</option>";
+                        }
+                    });
+
+                    $('#handle-discrete').html(option);
+
+                    form.render('select','handle-person');
+                })
+            }
+
+            var auditDiscrete = "{$template['audit_discrete']}";
+
+            if(auditDiscrete == 10)
+            {
+//                选择审核人员或流程
+                form.on("select(audit-object)",function(data)
+                {
+                    var value = data.value;
+
+                    var option = "";
+
+                    if(value == 10)
+                    {
+                        option = "<option value=''>{:L('SELECT_AUDITOR')}</option>";
+
+                        $.each(ccData,function (k,v)
+                        {
+                            option += "<option value="+v.member_id+">"+v.name+"</option>";
+                        });
+                    }
+
+                    if(value == 20)
+                    {
+                        var auditProcessData = JSON.parse('{$createTicketFormData.jsonAuditProcess}');
+
+                        option = "<option value=''>{:L('SELECT_PROCESS')}</option>";
+
+                        $.each(auditProcessData,function (k,v)
+                        {
+                            option += "<option value="+v.process_id+">"+v.process_name+"</option>";
+                        });
+                    }
+
+                    $('#audit').html(option);
+
+                    form.render('select','audit');
+                })
+            }
+        });
+
+    </script>
+
+</block>
+
+<block name="footer"></block>

@@ -1,0 +1,101 @@
+<!DOCTYPE HTML>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <title>{:C('WEB_TITLE')}</title>
+
+    <link rel="stylesheet" type="text/css" href="{:C('PC_ICON_HTTP')}" media="all"/>
+
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/js/layui/css/layui.css" media="all"/>
+
+    <script type="text/javascript" src="__PUBLIC__/js/jquery-1.9.1.min.js"></script>
+
+    <script type="text/javascript" src="__PUBLIC__/js/layer/layer.js"></script>
+
+    <script type="text/javascript" src="__PUBLIC__/js/layui/layui.js"></script>
+
+    <style type="text/css">
+
+        body, ol, ul, li, h1, h2, h3, h4, h5, h6, p, th, td, dl, dd, form, fieldset, legend, input, textarea, select{margin:0;padding:0;list-style: none;}
+
+        a{text-decoration:none;color:#333;}
+
+        .satisfy{position:relative}
+
+        .satisfy-header{line-height: 50px;text-align: center;background-color: #2b2f3e;width:100%}
+
+        .satisfy-header img{margin: -4px 0}
+
+        .satisfy-wrapper{width: 880px;height:360px;margin: 135px auto;border-radius:5px;box-shadow: 0 0 15px 0 rgba(0,0,0,.15);text-align: center;}
+
+        .satisfy-icon{padding: 65px 0 45px 0}
+
+        .satisfy-icon i.icon-warn{font-size: 70px;color:#ff7900}
+
+        .satisfy-notice{font-size:24px;font-weight: bold;color:#333}
+
+        .satisfy-jump{margin: 35px 0 65px 0;font-size: 18px;}
+
+        .satisfy-jump span{color:#d90000;}
+
+        .satisfy-footer{position: fixed;bottom: 0;width: 100%;text-align: center;font-size: 14px;line-height: 50px;}
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="satisfy">
+
+        <div class="satisfy-header">
+
+            <img src="__PUBLIC__/img/mobile-logo.png" alt="">
+
+        </div>
+
+        <div class="satisfy-wrapper">
+
+            <div class="satisfy-icon"><i class="iconfont icon-warn"></i></div>
+
+            <div class="satisfy-notice">{:L('SATISFY_REPEAT')}</div>
+
+            <div class="satisfy-jump">{:L('SATISFY_CLOSE',['second'=>"<span id='time'>5</span>"])}</div>
+
+        </div>
+
+        <div class="satisfy-footer">Copyright 2014@<a href="{:C('HTTP_PROTOCOL')}://{:C('HOST_DOMAIN')}" target='_blank'>{:C('WEB_SOURCE')}</a>{:L('ALL_RIGHTS_RESERVED')}</div>
+
+    </div>
+
+    <script type="text/javascript">
+
+        var t = 4;
+
+        setInterval("refer()",1000); //启动1秒定时
+
+        function refer()
+        {
+            if(t == 0)
+            {
+                window.location.href="about:blank";
+
+                window.close();
+            }
+            else
+            {
+                document.getElementById('time').innerHTML = t; // 显示倒计时
+
+                t--; // 计数器递减
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>

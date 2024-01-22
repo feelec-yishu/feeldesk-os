@@ -1,0 +1,477 @@
+<extend name="Public:common"/>
+
+<block name="crumb1">{:L('TICKET_SETTING')}</block>
+
+<block name="content">
+
+    <style type="text/css">td span{cursor:pointer}</style>
+
+    <div class="feeldesk-list">
+
+        <div class="feeldesk-list-header clearfix">
+
+            <div class="header-left">
+
+                <notempty name="data.auth.create">
+
+                    <a href="javascript:" onclick="openFormWindow(this,'{:U(\'create\')}')" class="createBtn" title="{:L('ADD_TEMPLATE')}">
+                        <i class="iconfont icon-xinzeng"></i>{:L('ADD_TEMPLATE')}
+                    </a>
+
+                </notempty>
+
+            </div>
+
+            <div class="header-right">
+
+                <form action="{$controllerAndAction}" method="get" class="fr">
+
+                    <div class="compact-search">
+
+                        <i class="iconfont icon-search"></i>
+
+                        <input type="text" name="keyword" value="{$keyword}" placeholder="{:L('TEMP_NAME')}"/>
+
+                        <a href="javascript:" class="searchBtn">{:L('SEARCH')}</a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="feeldesk-list-content">
+
+            <div class="feeldesk-list-main">
+
+                <table class="layui-table" lay-skin="nob" id='sortable'>
+
+                    <thead>
+
+                        <tr>
+
+                            <th class="left">{:L('TEMP_NAME')}</th>
+
+                            <th>{:L('TEMP_TYPE')}</th>
+
+                            <th>{:L('IS_ENABLE')}</th>
+
+                            <th>{:L('CC_COMPONENTS')}</th>
+                            <!--
+                                                        <th>{:L('MOBILE_COMPONENTS')}</th>
+
+                                                        <th>{:L('MAIL_COMPONENTS')}</th>
+                            -->
+
+                            <th>{:L('DEADLINES_COMPONENTS')}</th>
+
+                            <th>{:L('EARMARK_HANDLE')}</th>
+
+                            <th>{:L('AREA_COMPONENTS')}</th>
+
+                            <th>{:L('CREATE_TIME')}</th>
+
+                            <th>{:L('SORT')}</th>
+
+                            <th>{:L('OPERATION')}</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <empty name="data.template">
+
+                            <tr class="nodata center"><td colspan="17">{:L('NO_DATA')}</td></tr>
+
+                        <else />
+
+                            <volist name="data.template" id="vo">
+
+                                <tr class='cursor-move' sort="{$vo.sort}" data-value="{:encrypt($vo['ticket_model_id'],'TICKETMODEL')}">
+
+                                    <td class="left">{:getHighLight($keyword,$vo['lang_name'])}</td>
+
+                                    <td>{$templateTypes[$vo['type_id']]['lang_name']}</td>
+
+                                    <td onclick="toSwitch(this,'closed','{$vo.closed}')">
+
+                                        <eq name="vo.closed" value="0">
+
+                                            <span class="open-status enable">{:L('ALREADY_ENABLE')}</span>
+
+                                        <else />
+
+                                            <span class="open-status disable">{:L('ALREADY_DISABLE')}</span>
+
+                                        </eq>
+
+                                    </td>
+<!--
+
+                                    <td onclick="toSwitch(this,'user','{$vo.user_discrete}')">
+
+                                        <eq name="vo.user_discrete" value="10">
+
+                                            <span class="open-status enable">{:L('ALREADY_OPEN')}</span>
+
+                                            <else />
+
+                                            <span class="open-status disable">{:L('ALREADY_CLOSED')}</span>
+
+                                        </eq>
+
+                                    </td>
+-->
+
+                                    <td onclick="toSwitch(this,'cc','{$vo.cc_discrete}')">
+
+                                        <eq name="vo.cc_discrete" value="10">
+
+                                            <span class="open-status enable">{:L('ALREADY_OPEN')}</span>
+
+                                            <else />
+
+                                            <span class="open-status disable">{:L('ALREADY_CLOSED')}</span>
+
+                                        </eq>
+
+                                    </td>
+
+                                    <td onclick="toSwitch(this,'deadlines','{$vo.deadlines_discrete}')">
+
+                                        <eq name="vo.deadlines_discrete" value="10">
+
+                                            <span class="open-status enable">{:L('ALREADY_OPEN')}</span>
+
+                                        <else />
+
+                                            <span class="open-status disable">{:L('ALREADY_CLOSED')}</span>
+
+                                        </eq>
+
+                                    </td>
+
+                                    <td onclick="toSwitch(this,'handle','{$vo.handle_discrete}')">
+
+                                        <eq name="vo.handle_discrete" value="10">
+
+                                            <span class="open-status enable">{:L('ALREADY_OPEN')}</span>
+
+                                            <else />
+
+                                            <span class="open-status disable">{:L('ALREADY_CLOSED')}</span>
+
+                                        </eq>
+
+                                    </td>
+
+                                    <td onclick="toSwitch(this,'area','{$vo.area_discrete}')">
+
+                                        <eq name="vo.area_discrete" value="10">
+
+                                            <span class="open-status enable">{:L('ALREADY_OPEN')}</span>
+
+                                            <else />
+
+                                            <span class="open-status disable">{:L('ALREADY_CLOSED')}</span>
+
+                                        </eq>
+
+                                    </td>
+
+                                    <td>{$vo.create_time|date='Y-m-d',###}</td>
+
+                                    <td>{$vo.sort}</td>
+
+                                    <td class="feeldesk-list-operate">
+
+                                        <i class="iconfont icon-dian"></i>
+
+                                        <div class="operate-panel hidden">
+
+                                            <php>$id = encrypt($vo['ticket_model_id'],'TICKETMODEL');</php>
+
+                                            <notempty name="data.auth.editor">
+
+                                                <a href='javascript:' title="{:L('EDITOR')}" onclick="openFormWindow(this,'{:U(\'editor\',[\'id\'=>$id])}')">
+                                                    {:L('EDITOR')}
+                                                </a>
+
+                                            </notempty>
+
+                                            <notempty name="data.auth.form">
+
+                                                <a href="{:U('ticketForm/index',['tid'=>$id])}" title="{:L('EDITOR')}">{:L('TEMP_FORM')}</a>
+
+                                            </notempty>
+
+                                            <if condition="$data['auth']['delete'] && $vo['closed'] eq 1">
+
+                                                <a href="{:U('delete',['id'=>$id])}" load="async">{:L('DELETE')}</a>
+
+                                            </if>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            </volist>
+
+                        </empty>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <notempty name="data.page"><div class="feeldesk-list-footer"><div class="user-page">{$data.page}</div></div></notempty>
+
+        </div>
+
+    </div>
+
+    <div class="visitor-box hidden">
+
+        <div class="visitor-item">
+
+            <label>{:L('PC_TERMINAL')}</label>
+
+            <input type="text" value="" id="member"/>
+
+            <span class='copy-btn' onclick="copy('{:L(COPY_SUCCESS)}')" data-clipboard-action="copy" data-clipboard-target="#member">{:L('COPY')}</span>
+
+        </div>
+
+        <div class="visitor-item">
+
+            <label>{:L('MOBILE_TERMINAL')}</label>
+
+            <input type="text"  value="" id="m-member"/>
+
+            <span class='copy-btn' onclick="copy('{:L(COPY_SUCCESS)}')" data-clipboard-action="copy" data-clipboard-target="#m-member">{:L('COPY')}</span>
+
+        </div>
+
+        <div class="visitor-item">
+
+            <label>{:L('WECHAT_TERMINAL')}</label>
+
+            <input type="text"  value="" id="w-member"/>
+
+            <span class='copy-btn' onclick="copy('{:L(COPY_SUCCESS)}')" data-clipboard-action="copy" data-clipboard-target="#w-member">{:L('COPY')}</span>
+
+        </div>
+
+    </div>
+
+    <script type="text/javascript" src="__PUBLIC__/js/clipboard.min.js"></script>
+
+    <script type="text/javascript">
+
+        $(".visitor-view").on('click',function ()
+        {
+            var value1 = $(this).data('v1');
+
+            var value2 = $(this).data('v2');
+
+            var value3 = $(this).data('v3');
+
+            $("#member").val(value1);
+
+            $("#m-member").val(value2);
+
+            $("#w-member").val(value3);
+
+            layer.open(
+            {
+                type: 1,
+                area: ['800px'],
+                offset: ['100px'],
+                content: $('.visitor-box'),
+                skin:'visitor-box',
+                scrollbar: true,
+                cancel: function(index, layero)
+                {
+                    layer.close(index);
+                }
+            });
+        });
+
+    </script>
+
+    <script type="text/javascript">
+
+        var fixHelper = function(e, ui)
+        {
+            ui.children().each(function()
+            {
+                $(this).width($(this).width());  //在拖动时，拖动行的cell（单元格）宽度会发生改变。在这里做了处理就没问题了
+            });
+
+            return ui;
+        };
+
+        $(function()
+        {
+            var sortable = $( "#sortable");
+
+            var formIds = [];//受影响的表单ID
+
+            var selectSort,selectSx,placeSort,placeSx,temp,flag;
+
+            sortable.find('tbody').sortable(
+            {
+                cursor: "move",
+                helper: fixHelper,                  //调用fixHelper
+                axis:"y",
+                start:function(e, ui)
+                {
+                    ui.helper.css({"background":"#fff"});  //拖动时的行，要用ui.helper
+                    return ui;
+                },
+                sort:function(e, ui)
+                {
+                    formIds = [];
+
+                    selectSort = ui.item.attr("sort"); //当前元素的顺序
+
+                    placeSort = $(this).find('tr').filter('.ui-sortable-placeholder').next('tr').attr('sort');//新位置下的下一个元素的排序
+
+                    placeSx = parseInt(placeSort);
+
+                    selectSx = parseInt(selectSort);
+
+//                    说明是 向上移动
+                    if(selectSx > placeSx)
+                    {
+                        temp = placeSort;
+
+                        placeSx = selectSort;//最大
+
+                        selectSx = temp;//最小
+
+                        flag = false;
+                    }
+                    else
+                    {
+//                        向下移动
+                        placeSort = $(this).find('tr').filter('.ui-sortable-placeholder').prev('tr').attr('sort');
+
+                        placeSx = parseInt(placeSort);
+
+                        flag = true;
+                    }
+                },
+                stop:function(e, ui)
+                {
+                    var temp = "";
+
+                    var template = JSON.parse('{$data.templateJson}');
+
+                    $.each(template,function(k,v)
+                    {
+                        var sort = parseInt(v.sort);
+
+                        if(sort >= selectSx && sort <= placeSx)
+                        {
+                            if(sort == parseInt(selectSort))
+                            {
+                                if(flag)
+                                {
+                                    temp = v.ticket_model_id;
+                                }
+                                else
+                                {
+                                    formIds.splice(0,0,v.ticket_model_id);
+                                }
+                            }
+                            else
+                            {
+                                formIds.push(v.ticket_model_id);
+                            }
+                        }
+                    });
+
+                    if(flag)
+                    {
+                        formIds.splice(placeSx-selectSx,0,temp);
+                    }
+
+                    $.ajax(
+                    {
+                        url:'/AjaxRequest/updateSort?name=ticket_model&field=sort&key=ticket_model_id',
+                        type:'POST',
+                        async: false,
+                        data:{'ids':formIds, selectSx:selectSx, placeSx:placeSx},
+                        datatype:'json',
+                        success:function()
+                        {
+                            window.location.reload();
+                        },
+                        error:function()
+                        {
+                            feelDeskAlert('保存排序异常');
+                        }
+                    });
+
+                    return ui;
+                }
+            });
+
+            sortable.disableSelection();
+
+            if($('.feeldesk-list-footer').length == 0)
+            {
+                $('.feeldesk-list-main').css('height','100%');
+            }
+        });
+
+    </script>
+
+    <gt name="data.auth.editor" value="0">
+
+        <script type="text/javascript">
+
+            function toSwitch(obj,field,value)
+            {
+                var id = $(obj).parents('tr').data('value');
+
+                var loading = layer.load(2,{offset:'15vw'});
+
+                $.post('/AjaxRequest/changeTemplateDiscrete',{id:id,field:field,value:value},function(result)
+                {
+                    if(result.status == 0)
+                    {
+                        feelDeskAlert(result.msg);
+                    }
+                    else
+                    {
+                        result.isReload = 1;
+
+                        feelDeskAlert(result.msg,result);
+                    }
+
+                    layer.close(loading);
+                });
+            }
+
+        </script>
+
+    <else />
+
+        <script type="text/javascript">
+
+            function toSwitch(){}
+
+        </script>
+
+    </gt>
+
+</block>

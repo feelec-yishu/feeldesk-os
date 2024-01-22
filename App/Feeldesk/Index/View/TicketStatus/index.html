@@ -1,0 +1,171 @@
+<extend name="Public:common"/>
+
+<block name="crumb1">{:L('TICKET_SETTING')}</block>
+
+<block name="content">
+
+    <div class="feeldesk-list">
+
+        <div class="feeldesk-list-header clearfix">
+
+            <div class="header-left">
+
+                <notempty name="data.auth.create">
+
+                    <a href="javascript:" onclick="openFormWindow(this,'{:U(\'create\')}')" class="createBtn" title="{:L('NEW_STATUS')}">
+                        <i class="iconfont icon-xinzeng"></i>{:L('NEW_STATUS')}
+                    </a>
+
+                </notempty>
+
+            </div>
+
+            <div class="header-right">
+
+                <form action="{$controllerAndAction}" method="get" class="fr">
+
+                    <div class="compact-search">
+
+                        <i class="iconfont icon-search"></i>
+
+                        <input type="text" name="keyword" value="{$keyword}" placeholder="{:L('ENTER_STATUS_NAME')}"/>
+
+                        <a href="javascript:" class="searchBtn">{:L('SEARCH')}</a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="feeldesk-list-content">
+
+            <div class="feeldesk-list-main">
+
+                <table class="layui-table" lay-skin="nob">
+
+                    <thead>
+
+                        <tr>
+
+                            <th class="left">{:L('STATUS_NAME')}</th>
+
+                            <th>{:L('STATUS_IDENTIFIER')}</th>
+
+                            <th>{:L('IS_STOP_TIMING')}</th>
+
+                            <th>{:L('STATUS_SORT')}</th>
+
+                            <th>{:L('CREATE_TIME')}</th>
+
+                            <th>{:L('OPERATION')}</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <empty name="data.ticketStatus">
+
+                            <tr class="nodata center"><td colspan="11">{:L('NO_DATA')}</td></tr>
+
+                        <else />
+
+                            <volist name="data.ticketStatus" id="vo">
+
+                                <tr data-value="{:encrypt($vo['status_id'],'STATUS')}">
+
+                                    <td class="left"><span style="color:{$vo.status_color}">{$vo.lang_name}</span></td>
+
+                                    <td>
+
+                                        <if condition="$vo['is_first'] eq 1">
+
+                                            <span class="blue5">{:L('FIRST_STATUS')}</span>
+
+                                        <elseif condition="$vo['is_end'] eq 1" />
+
+                                            <span class="green5">{:L('END_STATUS')}</span>
+
+                                        <else />
+
+                                            <span class="iconfont icon-nothing gray2"></span>
+
+                                        </if>
+
+                                    </td>
+
+                                    <td>
+
+                                        <if condition="$vo['is_first'] neq 1 && $vo['is_end'] neq 1">
+
+                                            <eq name="vo.is_stop_timing" value="10">
+
+                                                <span class="green5">{:L('YES')}</span>
+
+                                            <else />
+
+                                                <span class="red1">{:L('NO')}</span>
+
+                                            </eq>
+
+                                        <else />
+
+                                            <span class="iconfont icon-nothing gray2"></span>
+
+                                        </if>
+
+                                    </td>
+
+                                    <td>{$vo.sort}</td>
+
+                                    <td>{$vo.create_time|getDates}</td>
+
+                                    <td class="feeldesk-list-operate">
+
+                                        <i class="iconfont icon-dian"></i>
+
+                                        <div class="operate-panel hidden">
+
+                                            <php>$id = encrypt($vo['status_id'],'STATUS');</php>
+
+                                            <notempty name="data.auth.editor">
+
+                                                <a href='javascript:' title="{:L('EDITOR')}" onclick="openFormWindow(this,'{:U(\'editor\',[\'id\'=>$id])}')">
+                                                    {:L('EDITOR')}
+                                                </a>
+
+                                            </notempty>
+
+                                            <if condition="$data['auth']['delete'] && $vo['is_first'] neq 1 && $vo['is_end'] neq 1">
+
+                                                <a href="{:U('delete',['id'=>$id])}" load="async">{:L('DELETE')}</a>
+
+                                            </if>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            </volist>
+
+                        </empty>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <notempty name="data.page"><div class="feeldesk-list-footer"><div class="user-page">{$data.page}</div></div></notempty>
+
+        </div>
+
+    </div>
+
+</block>

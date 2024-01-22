@@ -1,0 +1,143 @@
+<extend name="Public:common"/>
+
+<block name="crumb1">{:L('TICKET_CONFIG')}</block>
+
+<block name="content">
+
+    <div class="feeldesk-form ticket-config-form">
+
+        <div class="form-content">
+
+            <form action="" class="layui-form" method="post">
+
+                <div class="form-item">
+
+                    <div class="layui-form-item wd100 mb15">
+
+                        <label class="layui-form-label">{:L('TICKET_CLOSE')}</label>
+
+                        <div class="layui-input-inline">
+
+                            <input type="checkbox" name="config[handler]" title="{:L('DEAL_CLOSE')}" lay-skin="primary" <eq name='config.handler_closed' value='10'>checked</eq>>
+
+                            <input type="checkbox" name="config[publisher]" title="{:L('PUBLISH_CLOSE')}" lay-skin="primary" <eq name='config.publisher_closed' value='10'>checked</eq>>
+
+                            <i class="layui-icon layui-icon-about intro-icon middle" data-note="{:L('TICKET_CLOSE_NOTE')}"></i>
+
+                        </div>
+
+                    </div>
+
+                    <div class="layui-form-item wd100 mb15">
+
+                        <label class="layui-form-label">{:L('END_OPERATE')}</label>
+
+                        <div class="layui-input-inline">
+
+                            <input type="radio" name="config[end_ticket]" value="10" title="{:L('ENABLE')}" <eq name='config.end_operate' value='10'>checked</eq>>
+
+                            <input type="radio" name="config[end_ticket]" value="20" title="{:L('DISABLE')}" <eq name='config.end_operate' value='20'>checked</eq>>
+
+                            <i class="layui-icon layui-icon-about intro-icon middle" data-note="{:L('END_OPERATE_NOTE')}"></i>
+
+                        </div>
+
+                    </div>
+
+                    <div class="layui-form-item wd100 mb15">
+
+                        <label class="layui-form-label">{:L('STATUS_GO_BACK')}</label>
+
+                        <div class="layui-input-inline">
+
+                            <input type="radio" name="config[status_go_back]" value="10" title="{:L('ENABLE')}"
+                            <eq name='config.status_go_back' value='10'>checked</eq> lay-filter='goBack'>
+
+                            <input type="radio" name="config[status_go_back]" value="20" title="{:L('DISABLE')}"
+                            <eq name='config.status_go_back' value='20'>checked</eq> lay-filter='goBack'>
+
+                            <i class="layui-icon layui-icon-about intro-icon middle" data-note="{:L('GO_BACK_NOTE')}"></i>
+
+                        </div>
+
+                    </div>
+
+                    <div class="layui-form-item wd100 mb15 <eq name='config.status_go_back' value='20'>hidden</eq>" id="statusGoBackRole">
+
+                        <label class="layui-form-label">{:L('GO_BACK_ROLE')}</label>
+
+                        <div class="layui-input-inline">
+
+                            <input type="checkbox" name="config[handler_go_back]" title="{:L('HANDLER')}" lay-skin="primary" <eq name='config.handler_go_back' value='10'>checked</eq>>
+
+                            <input type="checkbox" name="config[publisher_go_back]" title="{:L('PUBLISHER')}" lay-skin="primary" <eq name='config.publisher_go_back' value='10'>checked</eq>>
+
+                            <i class="layui-icon layui-icon-about intro-icon middle" data-note="{:L('GO_BACK_ROLE_NOTE')}"></i>
+
+                        </div>
+
+                    </div>
+
+                    <div class="layui-form-item wd100 mb15">
+
+                        <label class="layui-form-label">{:L('OVER_TIME_SETTING')}</label>
+
+                        <div class="layui-input-inline">
+
+                            <input type="text" name="config[timeout]" value="{$config.overtime}" class="layui-input wd30 ui-block">
+
+                            <span> {:L('HOUR')}</span>
+
+                            <i class="layui-icon layui-icon-about intro-icon middle" data-note="{:L('OVER_TIME_NOTE')}"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <script type="text/javascript">
+
+                    layui.use('form', function ()
+                    {
+                        var form = layui.form;
+
+                        form.on('radio(goBack)',function(data)
+                        {
+                            if(data.value == 10)
+                            {
+                                $('#statusGoBackRole').slideDown('fast');
+                            }
+                            else
+                            {
+                                $('#statusGoBackRole').slideUp('fast').find("input[type='checkbox']").prop('checked',false);
+
+                                form.render();
+                            }
+                        })
+                    })
+
+                </script>
+                <div class="form-submit">
+
+                    <div class="layui-form-item">
+
+                        <div class="layui-input-inline">
+
+                            <a href="javascript:" class="layui-btn layui-btn-normal" id="submitForm">{:L('SUBMIT')}</a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <include file="Public:language" />
+
+</block>

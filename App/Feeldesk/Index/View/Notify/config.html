@@ -1,0 +1,430 @@
+<extend name="Public:common"/>
+
+<block name="crumb1">{:L('NOTIFY_MANAGER')}</block>
+
+<block name="content">
+
+    <div class="list-main notify-config">
+
+        <form class='layui-form'>
+
+            <div class="feeldesk-form relative hg100">
+
+                <div class="layui-tab mt0 hg100">
+
+                    <ul class="layui-tab-title">
+
+                        <li class="layui-this">{:L('TICKET')}</li>
+
+                    </ul>
+
+                    <div class="layui-tab-content">
+
+                        <div class="layui-tab-item layui-show">
+
+                            <div class="notice-item-content">
+
+                                <div class="notify-item">
+
+                                    <div class="ui-block"><i class="iconfont icon-notify-publish2"></i>{:L('TICKET_CREATE_NOTIFY')}</div>
+
+                                    <div class="notify-switch">
+
+                                        <div class="layui-form-item">
+
+                                            <div class="layui-input-block">
+
+                                                <input type="checkbox" name="config[create_notify_publish]" lay-skin="switch" <eq name='config.create_notify_publish' value='10'>checked</eq>/>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="notify-item">
+
+                                    <div class="ui-block"><i class="iconfont icon-notify-publish2"></i>{:L('TICKET_EDITOR_NOTIFY')}</div>
+
+                                    <div class="notify-switch">
+
+                                        <div class="layui-form-item">
+
+                                            <div class="layui-input-block">
+
+                                                <input type="checkbox" name="config[editor_notify_publish]" lay-skin="switch" <eq name='config.editor_notify_publish' value='10'>checked</eq>/>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="notify-item">
+
+                                    <div class="ui-block"><i class="iconfont icon-notify-publish2"></i>{:L('TICKET_END_NOTIFY')}</div>
+
+                                    <div class="notify-switch">
+
+                                        <div class="layui-form-item">
+
+                                            <div class="layui-input-block">
+
+                                                <input type="checkbox" name="config[end_notify_publish]" lay-skin="switch" <eq name='config.end_notify_publish' value='10'>checked</eq>/>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="notify-item">
+
+                                    <div class="ui-block"><i class="iconfont icon-notify-publish2"></i>{:L('FOLLOW_TICKET_END_NOTIFY')}</div>
+
+                                    <div class="notify-switch">
+
+                                        <div class="layui-form-item">
+
+                                            <div class="layui-input-block">
+
+                                                <input type="checkbox" name="config[end_notify_follow]" lay-skin="switch" <eq name='config.end_notify_follow' value='10'>checked</eq>/>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="notify-item">
+
+                                    <div class="ui-block"><i class="iconfont icon-notify-assign"></i>{:L('ASSIGN_HANDLE_NOTIFY')}</div>
+
+                                    <div class="notify-switch">
+
+                                        <div class="layui-form-item">
+
+                                            <div class="layui-input-block">
+
+                                                <input type="checkbox" name="config[assign_notify_handle]" lay-skin="switch" <eq name='config.assign_notify_handle' value='10'>checked</eq>/>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="notify-item">
+
+                                    <div class="ui-block"><i class="iconfont icon-notify-cc1"></i>{:L('CC_TICKET_NOTIFY')}</div>
+
+                                    <div class="notify-switch">
+
+                                        <div class="layui-form-item">
+
+                                            <div class="layui-input-block">
+
+                                                <input type="checkbox" name="config[ticket_cc_notify]" lay-skin="switch" <eq name='config.ticket_cc_notify' value='10'>checked</eq>/>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="notify-item">
+
+                                    <div class="ui-block"><i class="iconfont icon-notify-publish1"></i>{:L('REPLY_PUBLISH_NOTIFY')}</div>
+
+                                    <div class="notify-switch">
+
+                                        <div class="layui-form-item">
+
+                                            <div class="layui-input-block">
+
+                                                <input type="checkbox" name="config[reply_notify_publish]" lay-skin="switch" <eq name='config.reply_notify_publish' value='10'>checked</eq>/>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="notify-item">
+
+                                    <div class="ui-block"><i class="iconfont icon-nitify-handle1"></i>{:L('REPLY_HANDLER_NOTIFY')}</div>
+
+                                    <div class="notify-switch">
+
+                                        <div class="layui-form-item">
+
+                                            <div class="layui-input-block">
+
+                                                <input type="checkbox" name="config[reply_notify_handler]" lay-skin="switch" <eq name='config.reply_notify_handler' value='10'>checked</eq>/>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="notify-item">
+
+                                    <div class="ui-block"><i class="iconfont icon-notify-cc3"></i>{:L('REPLY_CC_NOTIFY')}</div>
+
+                                    <div class="notify-switch">
+
+                                        <div class="layui-form-item">
+
+                                            <div class="layui-input-block">
+
+                                                <input type="checkbox" name="config[reply_notify_cc]" lay-skin="switch" <eq name='config.reply_notify_cc' value='10'>checked</eq>/>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="notify-item">
+
+                                    <div class="ui-block"><i class="iconfont icon-nitify-handle1"></i>{:L('REPLY_FOLLOW_NOTIFY')}</div>
+
+                                    <div class="notify-switch">
+
+                                        <div class="layui-form-item">
+
+                                            <div class="layui-input-block">
+
+                                                <input type="checkbox" name="config[reply_notify_follow]" lay-skin="switch" <eq name='config.reply_notify_follow' value='10'>checked</eq>/>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="notify-item">
+
+                                    <div class="ui-block"><i class="iconfont icon-notify-handle2"></i>{:L('INTERNAL_NOTIFY_HANDLE')}</div>
+
+                                    <div class="notify-switch">
+
+                                        <div class="layui-form-item">
+
+                                            <div class="layui-input-block">
+
+                                                <input type="checkbox" name="config[internal_notify_handle]" lay-skin="switch" <eq name='config.internal_notify_handle' value='10'>checked</eq>/>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="notify-item">
+
+                                    <div class="ui-block"><i class="iconfont icon-notify-cc1"></i>{:L('INTERNAL_NOTIFY_CC')}</div>
+
+                                    <div class="notify-switch">
+
+                                        <div class="layui-form-item">
+
+                                            <div class="layui-input-block">
+
+                                                <input type="checkbox" name="config[internal_notify_cc]" lay-skin="switch" <eq name='config.internal_notify_cc' value='10'>checked</eq>/>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="notify-item">
+
+                                    <div class="ui-block"><i class="iconfont icon-notify-handle2"></i>{:L('INTERNAL_NOTIFY_FOLLOW')}</div>
+
+                                    <div class="notify-switch">
+
+                                        <div class="layui-form-item">
+
+                                            <div class="layui-input-block">
+
+                                                <input type="checkbox" name="config[internal_notify_follow]" lay-skin="switch" <eq name='config.internal_notify_follow' value='10'>checked</eq>/>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="notify-item">
+
+                                    <div class="ui-block"><i class="iconfont icon-notify-state"></i>{:L('UPDATE_STATUS_PUBLISH')}</div>
+
+                                    <div class="notify-switch">
+
+                                        <div class="layui-form-item">
+
+                                            <div class="layui-input-block">
+
+                                                <input type="checkbox" name="config[status_notify_publish]" lay-skin="switch" <eq name='config.status_notify_publish' value='10'>checked</eq>/>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="notify-item">
+
+                                    <div class="ui-block"><i class="iconfont icon-notify-state"></i>{:L('UPDATE_STATUS_FOLLOW')}</div>
+
+                                    <div class="notify-switch">
+
+                                        <div class="layui-form-item">
+
+                                            <div class="layui-input-block">
+
+                                                <input type="checkbox" name="config[status_notify_follow]" lay-skin="switch" <eq name='config.status_notify_follow' value='10'>checked</eq>/>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="notify-item">
+
+                                    <div class="ui-block"><i class="iconfont icon-notify-restart"></i>{:L('RESTART_TICKET_NOTIFY')}</div>
+
+                                    <div class="notify-switch">
+
+                                        <div class="layui-form-item">
+
+                                            <div class="layui-input-block">
+
+                                                <input type="checkbox" name="config[restart_ticket_notify]" lay-skin="switch" <eq name='config.restart_ticket_notify' value='10'>checked</eq>/>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="notify-item">
+
+                                    <div class="ui-block"><i class="iconfont icon-notify-restart"></i>{:L('RESTART_FOLLOW_NOTIFY')}</div>
+
+                                    <div class="notify-switch">
+
+                                        <div class="layui-form-item">
+
+                                            <div class="layui-input-block">
+
+                                                <input type="checkbox" name="config[restart_notify_follow]" lay-skin="switch" <eq name='config.restart_notify_follow' value='10'>checked</eq>/>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="notify-item">
+
+                                    <div class="ui-block"><i class="iconfont icon-notify-comment"></i>{:L('COMMENT_REPLY_NOTIFY')}</div>
+
+                                    <div class="notify-switch">
+
+                                        <div class="layui-form-item">
+
+                                            <div class="layui-input-block">
+
+                                                <input type="checkbox" name="config[comment_reply_notify]" lay-skin="switch" <eq name='config.comment_reply_notify' value='10'>checked</eq>/>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="notify-item">
+
+                                    <div class="ui-block"><i class="iconfont icon-notify-timeout"></i>{:L('TICKET_TIMEOUT_NOTIFY')}</div>
+
+                                    <div class="notify-switch">
+
+                                        <div class="layui-form-item">
+
+                                            <div class="layui-input-block">
+
+                                                <input type="checkbox" name="config[ticket_timeout_notify]" lay-skin="switch" <eq name='config.ticket_timeout_notify' value='10'>checked</eq>/>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="notify-submit">
+
+                                <a href="javascript:" class="layui-btn layui-btn-normal" id="submitForm">{:L('SUBMIT')}</a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <include file="Public:language" />
+
+</block>

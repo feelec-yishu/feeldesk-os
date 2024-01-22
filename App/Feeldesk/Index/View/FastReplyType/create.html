@@ -1,0 +1,41 @@
+<extend name="Public:window"/>
+
+<block name="window-form">
+
+    <form action="" class="layui-form" >
+
+        <div class="form-item">
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('FAST_GROUP_NAME')}：</label>
+
+                <div class="layui-input-inline">
+
+                    <input type="text" name="fast_type[type_name]" value="" class="layui-input" placeholder="{:L('ENTER_GROUP_NAME')}" />
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="form-submit">
+
+            <div class="layui-form-item">
+
+                <div class="layui-input-inline">
+
+                    <a href="javascript:" class="layui-btn layui-btn-normal" id="submitForm">{:L('SUBMIT')}</a>
+
+                    <a href="javascript:" class="layui-btn layui-btn-normal cancel-btn" id="cancel-form">{:L('CANCEL')}</a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</block>

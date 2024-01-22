@@ -1,0 +1,67 @@
+<extend name="Public:common"/>
+
+<block name="crumb1">{:L('TICKET_SETTING')}</block>
+
+<block name="content">
+
+    <div class="list-main">
+
+        <ul class="ticket-view-item">
+
+            <volist name="ticketView" id="vo">
+
+                <li>
+
+                    <i class="iconfont {$vo.field_icon}"></i>
+
+                    <div class="field-name"><span>{:L('FIELD_NAME')}：</span><span>{$vo.lang_name}</span></div>
+
+                    <div class="field-state">
+
+                        <span>{:L('STATUS')}：</span>
+
+                        <span class="open-status {$vo.class}">{$vo.state_name}</span>
+
+                    </div>
+
+                    <div class="fr"><a href="javascript:" class="ticket_view" data-view="{$vo.is_show}" data-value="{$vo.view_id}">{$vo.btn_name}</a></div>
+
+                </li>
+
+            </volist>
+
+        </ul>
+
+    </div>
+
+    <script type='text/javascript'>
+
+        $(function()
+        {
+            $(".ticket_view").on('click',function()
+            {
+                var value = $(this).data('value');
+
+                var is_show = $(this).data('view');
+
+                var loading = layer.load(2,{offset:['15vw']});
+
+                $.post("{:U('ticketView/edit')}",{"is_show":is_show,"id":value},function(data)
+                {
+                    if(data.status == 1)
+                    {
+                        feelDeskAlert(data.msg,data);
+                    }
+                    else
+                    {
+                        feelDeskAlert(data.msg);
+                    }
+
+                    layer.close(loading);
+                })
+            })
+        })
+
+    </script>
+
+</block>

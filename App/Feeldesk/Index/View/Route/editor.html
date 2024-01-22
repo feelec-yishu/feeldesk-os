@@ -1,0 +1,117 @@
+<extend name="Public:window"/>
+
+<block name="window-form">
+
+    <style>
+
+        .layui-form-select dl{max-height: 255px !important;}
+
+    </style>
+
+    <form action="" class="layui-form">
+
+        <div class="form-item route-config">
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('ROUTE_NAME')}</label>
+
+                <div class="layui-input-inline">
+
+                    <input type="text" name="route[route_name]" value="{$route.route_name}" class="layui-input" placeholder="{:L('ROUTE_NAME')}" />
+
+                </div>
+
+            </div>
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('ROUTE_RULE')}</label>
+
+                <div class="layui-input-inline">
+
+                    <select name="route[channel]">
+
+                        <option value="">{:L('PLEASE_SELECT')}{:L('ROUTE_RULE')}</option>
+
+                        <option value="mail" <eq name="route.channel" value="mail">selected</eq>>{:L('ROUTE_RULE_MAIL')}</option>
+
+                        <volist name='templates' id='vo'>
+
+                            <option value="template_{$vo.ticket_model_id}" <eq name='vo.ticket_model_id' value="$route['route_value']">selected</eq>>{:L('ROUTE_RULE_TEMPLATE',['template'=>$vo['lang_name']])}</option>
+
+                        </volist>
+
+                    </select>
+
+                </div>
+
+                <i class="layui-icon layui-icon-about intro-icon" data-note="{:L('ROUTE_RULE_NOTE')}"></i>
+
+            </div>
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('HANDLE_GROUP')}</label>
+
+                <div class="layui-input-inline" id="departments"></div>
+
+                <i class="layui-icon layui-icon-about intro-icon" data-note="{:L('ROUTE_GROUP')}"></i>
+
+            </div>
+
+        </div>
+
+        <div class="form-submit">
+
+            <div class="layui-form-item">
+
+                <div class="layui-input-inline">
+
+                    <a href="javascript:" class="layui-btn layui-btn-normal" id="submitForm">{:L('SUBMIT')}</a>
+
+                    <a href="javascript:" class="layui-btn layui-btn-normal cancel-btn" id="cancel-form">{:L('CANCEL')}</a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+    <script type="text/javascript">
+
+        var jsonDepartmentData = JSON.parse('{$jsonDepartmentData}');
+
+        xmSelect.render({
+            el: '#departments',
+            name:'group_id',
+            tips:"{:L('SELECT_EXCL_SECTOR')}",
+            model: { label: { type: 'text' } },
+            radio: true,
+            clickClose: true,
+            filterable:true,
+            theme: {
+                color: '#12c9cb'
+            },
+            searchTips:"{:L('PLEASE_ENTER_KEYWORDS')}",
+            tree: {
+                show: true,
+                strict: false,
+                indent: 20,
+                expandedKeys: true
+            },
+            height: '200px',
+            initValue:['{$route.group_id}'],
+            prop: {
+                name: 'group_name',
+                value: 'group_id',
+                children:'child'
+            },
+            data:jsonDepartmentData
+        })
+
+    </script>
+
+</block>

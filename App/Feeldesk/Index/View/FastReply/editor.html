@@ -1,0 +1,90 @@
+<extend name="Public:window"/>
+
+<block name="window-form">
+
+    <form action="" class="layui-form">
+
+        <div class="form-item">
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('TITLE')}</label>
+
+                <!-- 主题 -->
+                <div class="layui-input-inline">
+
+                    <input type="text" name="fast_reply[fast_title]" value="{$detail.fast_title}" class="layui-input" placeholder="{:L('ENTER_TITLE')}" />
+
+                </div>
+
+            </div>
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('SELECT_GROUP')}</label>
+
+                <!-- 分组 -->
+                <div class="layui-input-inline">
+
+                    <select name="fast_reply[fast_type_id]">
+
+                        <option value="">{:L('SELECT_GROUP')}</option>
+
+                        <volist name="fastReplyType" id="vo">
+
+                            <option value="{$vo.fast_type_id}" <eq name="detail.fast_type_id" value="$vo['fast_type_id']">selected='selected'</eq>>{$vo.type_name}</option>
+
+                        </volist>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <!-- 快捷回复内容 -->
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('CONTENT')}</label>
+
+                <div class="layui-input-inline">
+
+                    <textarea name="fast_reply[fast_content]" id="fastEditor" class="layui-textarea" >{$detail.fast_content}</textarea>
+
+                </div>
+
+            </div>
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('IS_ENABLE')}：</label>
+
+                <div class="layui-input-inline">
+
+                    <input type="checkbox" name="fast_reply[activity]" lay-skin="switch" <eq name="detail.activity" value="2"> checked</eq>>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="form-submit">
+
+            <div class="layui-form-item">
+
+                <div class="layui-input-inline">
+
+                    <a href="javascript:" class="layui-btn layui-btn-normal" id="submitForm">{:L('SUBMIT')}</a>
+
+                    <a href="javascript:" class="layui-btn layui-btn-normal cancel-btn" id="cancel-form">{:L('CANCEL')}</a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</block>

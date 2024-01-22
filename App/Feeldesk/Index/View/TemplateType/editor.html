@@ -1,0 +1,113 @@
+<extend name="Public:window"/>
+
+<block name="window-form">
+
+    <form action="" class="layui-form">
+
+        <div class="form-item">
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('TYPE_NAME')}</label>
+
+                <div class="layui-input-inline">
+
+                    <input type="text" name="template_type[type_name]" value="{$detail.type_name}" placeholder="{:L('ENTER_TYPE_NAME')}" class="layui-input">
+
+                </div>
+
+            </div>
+
+            <eq name="langAuth['en_auth']" value="10">
+
+                <div class="layui-form-item">
+
+                    <label class="layui-form-label">English name</label>
+
+                    <div class="layui-input-inline">
+
+                        <input type="text" name="template_type[name_en]" value="{$detail.name_en}" placeholder="Enter English name" class="layui-input">
+
+                    </div>
+
+                </div>
+
+            </eq>
+
+            <eq name="langAuth['jp_auth']" value="10">
+
+                <div class="layui-form-item">
+
+                    <label class="layui-form-label">日本語名</label>
+
+                    <div class="layui-input-inline">
+
+                        <input type="text" name="template_type[name_jp]" value="{$detail.name_jp}" placeholder="日本語名を入力してください" class="layui-input">
+
+                    </div>
+
+                </div>
+
+            </eq>
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('SORT')}</label>
+
+                <div class="layui-input-inline">
+
+                    <input type="text" name="template_type[sort]" value="{$detail.sort}" placeholder="{:L('SORT')}" class="layui-input">
+
+                </div>
+
+            </div>
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('TEMP_APPLY')}</label>
+
+                <div class="layui-input-inline" title="{:L('TEMP_APPLY_NOTE')}">
+
+                    <input type="radio" name="template_type[apply]" value="10" title="{:L('TEMP_EXTERNAL')}" <eq name="detail.apply" value="external"> checked</eq>>
+
+                    <input type="radio" name="template_type[apply]" value="20" title="{:L('TEMP_INSIDE')}" <eq name="detail.apply" value="inside"> checked</eq>>
+
+                    <input type="radio" name="template_type[apply]" value="30" title="{:L('TEMP_CURRENCY')}" <eq name="detail.apply" value="currency"> checked</eq>>
+
+                </div>
+
+            </div>
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('IS_ENABLE')}</label>
+
+                <div class="layui-input-inline">
+
+                    <input type="checkbox" name="template_type[closed]" lay-skin="switch" title="{:L('TYPE_ENABLE_NOTE')}" <eq name="detail.closed" value="0"> checked</eq>>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="form-submit">
+
+            <div class="layui-form-item">
+
+                <div class="layui-input-inline">
+
+                    <a href="javascript:" class="layui-btn layui-btn-normal" id="submitForm">{:L('SUBMIT')}</a>
+
+                    <a href="javascript:" class="layui-btn layui-btn-normal cancel-btn" id="cancel-form">{:L('CANCEL')}</a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</block>

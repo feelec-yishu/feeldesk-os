@@ -104,8 +104,6 @@ class MenuWidget extends Controller
 
         $this->assign('hour',date('H',time()));
 
-	    $this->assign('language',getLanguage(self::$company));
-
         $this->assign('countMessage',$message);
 
         $this->display('Widget:menu');

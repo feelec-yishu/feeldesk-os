@@ -27,8 +27,6 @@ class LoginController extends Controller
 		{
 			$login = cookie('user_login_cache');
 
-			$this->assign('language',getLanguage());
-
             $this->assign('lang',strtolower(cookie('think_language')));
 
             $this->assign('login',$login);

@@ -31,10 +31,10 @@
 
 #### 开源项目部署文档
 
-[FeelDesk（OS）开源版安装部署文档](http://wiki.feelec.com.cn/zyplayer-doc-manage/doc-wiki#/page/share/view?space=f5d0a27926d64cafbe69190174cbef64&pageId=284)
+[FeelDesk（OS）开源版安装部署文档](https://bihuan.feelec.com.cn/#/withoutKnowledge?id=4f0f798ac4b8bc49257d3a713a8bd5f1&dataId=31d75a91191a0a74c99b3cb3deeb8ae3)
 
-- $\color{red}{按安装文档操作即可，已无数次成功安装，不成功请检查自己的安装步骤}$
-- $\color{red}{由于项目较多，无法回应大家的安装类问题；}$
+- <font color="red">按安装文档操作即可，已无数次成功安装，不成功请检查自己的安装步骤；</font>
+- <font color="red">由于项目较多，无法回应大家的安装类问题；</font>
 
 #### 体验账号
 
@@ -63,21 +63,21 @@
 
 #### 附：专业版框架
 
-| <img width=75/>技术<img width=75/> | <img width=10/>版本<img width=10/> | <img width=75/>说明<img width=75/> |
-| :--------------------------------: | :--------------------------------: | :--------------------------------: |
-|                PHP                |                7.4                |              开发语言              |
-|               Nginx               |                1.20                |             Web服务器             |
-|               Mysql               |                5.7                |               数据库               |
-|               Redis               |                6.0                |             缓存数据库             |
-|              ThinkPHP              |                6.x                |            后端核心框架            |
-|               Swoole               |                4.6                |            后端协程框架            |
-|                Vue                |                2.0                |            前端核心框架            |
-|             ElementUi             |                2.0                |             前端UI框架             |
-|               UniApp               |                3.x                |           移动端核心框架           |
-|               uView               |                1.x                |            移动端UI框架            |
+| <font width=75/>技术<font width=75/> | <font width=10/>版本<font width=10/> | <font width=75/>说明<font width=75/> |
+|:---------------------------------:|:--------------------------------:| :--------------------------------: |
+|                PHP                |               8.0                |              开发语言              |
+|               Nginx               |               1.20               |             Web服务器             |
+|               Mysql               |               8.0                |               数据库               |
+|               Redis               |               6.0                |             缓存数据库             |
+|             ThinkPHP              |               8.0                |            后端核心框架            |
+|              Swoole               |              5.1.3               |            后端协程框架            |
+|                Vue                |               2.0                |            前端核心框架            |
+|             ElementUi             |               2.0                |             前端UI框架             |
+|              UniApp               |               3.x                |           移动端核心框架           |
+|               uView               |               1.x                |            移动端UI框架            |
 
 
-#### $\color{red}{我们另一开源项目：CRM系统已经发布，有需要者移步：}$
+#### <font color="red">我们另一开源项目：CRM系统已经发布，有需要者移步：</font>
 -   FeelCRM客户管理系统 https://gitee.com/feelecs/feelcrm
 
 #### 开源版系统展示
@@ -86,39 +86,39 @@
 
    <br />
 
-  <img src="https://qiniu.feelec.net/install/open/v3-base/%E5%8F%91%E5%B8%83%E5%B7%A5%E5%8D%95.png" alt="" align=center/>
+  <img src="https://foruda.gitee.com/images/1719891263044815057/95fade1b_10375455.png" alt="" align=center/>
 
 
 - 工单管理
 
    <br />
 
-  <img src="https://qiniu.feelec.net/install/open/v3-base/%E5%B7%A5%E5%8D%95%E7%AE%A1%E7%90%86.png" alt="" align=center/>
+  <img src="https://foruda.gitee.com/images/1719891363747628228/6a3f6793_10375455.png" alt="" align=center/>
 
 
 - 模板管理
 
    <br />
 
-  <img src="https://qiniu.feelec.net/install/open/v3-base/%E6%A8%A1%E6%9D%BF%E7%AE%A1%E7%90%86.png" alt="" align=center/>
+  <img src="https://foruda.gitee.com/images/1719891386937622654/073b16ff_10375455.png" alt="" align=center/>
 
 
 - 状态管理
 
    <br />
 
-  <img src="https://qiniu.feelec.net/install/open/v3-base/%E7%8A%B6%E6%80%81%E7%AE%A1%E7%90%86.png" alt="" align=center/>
+  <img src="https://foruda.gitee.com/images/1719891402985585289/7d60c0bf_10375455.png" alt="" align=center/>
 
 
 - 路由配置
 
    <br />
 
-  <img src="https://qiniu.feelec.net/install/open/v3-base/%E8%B7%AF%E7%94%B1%E9%85%8D%E7%BD%AE.png" alt="" align=center/>
+  <img src="https://foruda.gitee.com/images/1719891424676046500/ecd78644_10375455.png" alt="" align=center/>
 
 
 - 组织架构
 
    <br />
 
-  <img src="https://qiniu.feelec.net/install/open/v3-base/%E7%BB%84%E7%BB%87%E6%9E%B6%E6%9E%84.png" alt="" align=center/>
+  <img src="https://foruda.gitee.com/images/1719891456138789527/2d8a2ffe_10375455.png" alt="" align=center/>

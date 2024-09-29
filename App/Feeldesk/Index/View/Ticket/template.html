@@ -1,0 +1,51 @@
+<extend name="Public:common"/>
+
+<block name="crumb1">{:L('TICKET_MANAGER')}</block>
+
+<block name="crumb2">{:L('SELECT_TEMPLATE')}</block>
+
+<block name="content">
+
+	<div class="ticket-template">
+
+        <volist name="ticketTemplate" id="v1">
+
+            <dl>
+
+                <dt>{$v1.type_lang_name}<span>（ {$v1['template']|getCount} ）</span></dt>
+
+                <volist name="v1.template" id="v2">
+
+                    <php>$m = ($i+3)%4;</php>
+
+                    <dd class="<eq name='m' value='0'>ml0</eq>" title="{$v2.lang_name}">
+
+                        <i class="iconfont icon-moban"></i>
+
+                        <span class="ellipsis">{$v2.lang_name}</span>
+
+                        <a href="{:U('ticket/create',['id'=>encrypt($v2['ticket_model_id'],'modelID')])}" load="loading">{:L('APPLICATION')}</a>
+
+                    </dd>
+
+                </volist>
+
+            </dl>
+
+        </volist>
+
+    </div>
+
+    <script type="text/javascript">
+
+        var path = "{$path}";
+
+        $(function ()
+        {
+            $("#right",top.window.document).contents().find("a[href='/Ticket/template']").addClass('current')
+                    .parents('.feeldesk-menu-second').siblings().find('a').removeClass('current');
+        })
+
+    </script>
+
+</block>

@@ -1,0 +1,213 @@
+<!DOCTYPE HTML>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="">
+
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <title>{:C('WEB_TITLE')}</title>
+
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/js/layui/css/layui.css" media="all"/>
+
+    <script type="text/javascript" src="__PUBLIC__/js/jquery-1.9.1.min.js"></script>
+
+    <script type="text/javascript" src="__PUBLIC__/js/layer/layer.js"></script>
+
+    <script type="text/javascript" src="__PUBLIC__/js/layui/layui.js"></script>
+
+    <style type="text/css">
+
+        body, ol, ul, li, h1, h2, h3, h4, h5, h6, p, th, td, dl, dd, form, fieldset, legend, input, textarea, select{margin:0;padding:0;list-style: none;}
+
+        a{text-decoration:none;color:#333;}
+
+        .satisfy{position:relative}
+
+        .satisfy-header{line-height: 50px;text-align: center;background-color: #2b2f3e;width:100%}
+
+        .satisfy-header img{margin: -4px 0}
+
+        .satisfy-wrapper{width: 880px;margin: 70px auto;border-radius:5px;box-shadow: 0 0 15px 0 rgba(0,0,0,.15);text-align: center;}
+
+        .satisfy-title{font-weight: bold;font-size: 20px;padding: 30px 0}
+
+        .satisfy-top hr{display: inline-block;width: 25px;color: #666;vertical-align: middle}
+
+        .satisfy-top span{margin: 0 15px;vertical-align: middle;font-size: 16px;}
+
+        .satisfy .satisfy-name{text-align: center;height:30px;line-height:30px;font-size: 13px;}
+
+        .satisfy .satisfy-star{text-align: center;width: 100%}
+
+        .satisfy .satisfy-label{font-size: 0;text-align: center;margin-top: 10px;margin-bottom: 20px;}
+
+        .satisfy .satisfy-label .label-item{display: inline-block;font-size:12px;height: 30px;line-height: 30px;padding: 0 10px;border: 1px solid #e3e9ed;
+            color: #666;margin-right: 5px;margin-bottom:5px;cursor: pointer}
+
+        .satisfy .satisfy-label .current,.satisfy .satisfy-label .label-item:hover{border-color:#142030;color:#142030}
+
+        .satisfy textarea {display: block;width:calc(100% - 150px);margin:0 auto;padding: 10px;height: 251px;line-height: 20px;font-size: 14px;outline: 0;border: 1px solid #cecece;border-radius:5px;background: #fff;resize:none}
+
+        .satisfy-verify{text-align: left;margin: 20px 0 0 64px;font-size: 16px}
+
+        .satisfy-verify input{border: 1px solid #cecece;border-radius: 5px;width: 200px;height: 40px;line-height:40px;margin:0 15px 0 0;padding-left: 10px}
+
+        .satisfy-verify img{cursor: pointer}
+
+        .satisfy textarea:focus,.satisfy input:focus{border-color:#8c92a4}
+
+        .sa-btn {display:inline-block;background-color:#2b2f3e;width:200px;height: 50px;line-height: 50px;border-radius:5px;margin:50px 0;text-align: center;cursor: pointer;color:#fff}
+
+        .sa-btn:hover{color:#fff}
+
+        .satisfy-footer{position: fixed;bottom: 0;width: 100%;text-align: center;font-size: 14px;line-height: 50px;}
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="satisfy">
+
+        <div class="satisfy-header">
+
+            <img src="__PUBLIC__/img/mobile-logo.png" alt="">
+
+        </div>
+
+        <div class="satisfy-wrapper">
+
+            <div class="satisfy-title">{:L('SATISFACTION')}</div>
+
+            <div class="satisfy-top" id="satisfyConfig">
+
+                <div id='satisfy-name' class="satisfy-name">— {:L('SATISFACTION_SERVICE')} —</div>
+
+                <div id='satisfy-star' class="satisfy-star"></div>
+
+                <ul  id="satisfy-label" class="satisfy-label"></ul>
+
+            </div>
+
+            <div class="satisfy-main">
+
+                <form id="satisfy-form" method="post">
+
+                    <input type="hidden" name=satisfy[satisfy_id] id="satisfy" value="0"/>
+
+                    <input type="hidden" name='satisfy[satisfy_score]' id="satisfy-score" value="0"/>
+
+                    <textarea id='advise' name=satisfy[satisfy_advise] placeholder="{:L('ADVISE')}："></textarea>
+
+                    <div class="satisfy-verify">
+
+                        <input type="text" name='satisfy[verify_code]' value=""  placeholder="{:L('IMAGE_CODE')}" id="verify"/>
+
+                        <img src="{:U('Public/satisfyVerify')}" id='verifyImg' onclick="$(this).attr('src',$(this).attr('src')+'?'+new Date().getTime())" alt="">
+
+                    </div>
+
+                </form>
+
+                <div class="sa-btn-line clearfix">
+
+                    <a href="javascript:submitSatisfy()" class="fl sa-btn bg0">{:L('SUBMIT')}</a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="satisfy-footer">Copyright 2014@<a href="{:C('HTTP_PROTOCOL')}://{:C('HOST_DOMAIN')}" target='_blank'>{:C('WEB_SOURCE')}</a>{:L('ALL_RIGHTS_RESERVED')}</div>
+
+    </div>
+
+    <script type="text/javascript">
+
+        layui.use('rate',function()
+        {
+            var rate = layui.rate;
+
+            var satisfyData = JSON.parse('{$satisfyData}');
+
+            rate.render(
+            {
+                elem:"#satisfy-star",
+                value:5,
+                setText:function(value)
+                {
+                    var satisfy = satisfyData.satisfy;
+
+                    $('#satisfy').val(satisfy[value-1]['satisfy_id']);
+
+                    $('#satisfy-score').val(satisfy[value-1]['score']);
+
+                    $('#satisfy-name').text(satisfy[value-1]['lang_name']);
+
+                    var labels = satisfyData['labels'][satisfy[value-1]['satisfy_id']];
+
+                    if(labels.length > 0)
+                    {
+                        var li = '';
+
+                        $.each(labels,function(k,v)
+                        {
+                            li += "<li class='label-item' onclick='chooseSatisfyLabel(this,"+ v.label_id +")'>"+ v.label_name +"</li>";
+                        });
+
+                        $('#satisfy-label').html(li);
+                    }
+
+                    $('#satisfy-form').find("input[name='satisfy[labelId][]']").remove();
+                }
+            })
+        });
+
+        var chooseSatisfyLabel = function (t,id)
+        {
+            $(t).toggleClass('current');
+
+            var satisfyForm = $('#satisfy-form');
+
+            var labelInput = "<input type='hidden' name='satisfy[labelId][]' value='"+id+"' v='"+id+"'>";
+
+            if(satisfyForm.find("input[value='"+id+"']").length === 0)
+            {
+                satisfyForm.append(labelInput);
+            }
+            else
+            {
+                satisfyForm.find("input[v='"+id+"']").remove()
+            }
+        };
+
+        var submitSatisfy = function()
+        {
+            var loading = layer.load(2);
+
+            $.post('/Satisfy/create?activation_key={$activation_key}&email={$email}',$("#satisfy-form").serialize(),function(data)
+            {
+                if(data.status === 0)
+                {
+                    layer.close(loading);
+
+                    layer.msg(data.msg,{icon:2,time:1000,offset:['150px']},function()
+                    {
+                        $('#verifyImg').attr('src',"{:U('Public/satisfyVerify')}?"+new Date().getTime());
+                    });
+                }
+                else
+                {
+                    window.location.href = data.url;
+                }
+            },'JSON')
+        }
+
+    </script>
+
+</body>
+
+</html>

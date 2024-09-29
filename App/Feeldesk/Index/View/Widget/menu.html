@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="">
+
+    <head>
+
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+
+        <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+
+        <title>{:C('WEB_TITLE')}</title>
+
+        <link rel="stylesheet" href="__PUBLIC__/css/common.css"/>
+
+        <link rel="stylesheet" href="INDEX_PUBLIC_CSS/index.css"/>
+
+        <link rel="stylesheet" type="text/css" href="__PUBLIC__/js/layui/css/layui.css"/>
+
+        <link rel="stylesheet" href="{:C('PC_ICON_HTTP')}">
+
+        <script>
+            var moduleName = "{$Think.MODULE_NAME}";
+        </script>
+
+        <script type="text/javascript" src="__PUBLIC__/js/jquery-1.9.1.min.js"></script>
+
+        <script type="text/javascript" src="__PUBLIC__/js/lang/zh-cn.js"></script>
+
+        <script type="text/javascript" src="__PUBLIC__/js/layer/layer.js"></script>
+
+        <script type="text/javascript" src="__PUBLIC__/js/layui/layui.js"></script>
+
+        <script type="text/javascript" src="__PUBLIC__/js/feeldesk.js"></script>
+
+        <script type="text/javascript" src="INDEX_PUBLIC_JS/index.js"></script>
+
+    </head>
+
+    <body id='menu-body'>
+
+        <div class="feeldesk">
+
+            <div class="feeldesk-header">
+
+                <div class="header-left">
+
+                    <i class="iconfont icon-fold" id="menu-fold"></i>
+
+                    <div>{$index.name}，<egt name="hour" value="12">{:L('GOOD_AFTER')}<else />{:L('GOOD_MORNING')}</egt></div>
+
+                </div>
+
+                <div class="header-right">
+
+                    <div class="nav refresh"><a href="javascript:refresh()" class="iconfont icon-refresh" title="{:L('REFRESH')}"></a></div>
+
+                    <!-- 消息 -->
+                    <div class="nav">
+
+                        <a href="{:U('Index/message/getMessage',['types'=>'unread'])}" target="rightMain" class="item message" data-id="1">
+
+                            <i class="iconfont icon-message"></i>
+
+                            <span id="msgNum" class="layui-badge <empty name='countMessage'>visibility</empty>">{$countMessage}</span>
+
+                        </a>
+
+                    </div>
+
+                    <!-- 个人中心 -->
+                    <div class="nav personal-menu">
+
+                        <php>
+
+                            if(in_array($index['company_id'],C('REPLACE_LOGO')))
+                            {
+                                $url = '__PUBLIC__/img/'.$index['company_id'].'/default.png';
+                            }
+                            else
+                            {
+                                $url = '/Attachs/face/default.jpg';
+                            }
+
+                        </php>
+
+                        <a href="{:U('Index/index/base')}?redirect_url=/Setting/userinfo" target="rightMain" class="item">
+
+                            <i class="login-status-icon iconfont icon-online <eq name='login_status' value='0'>gray2</eq>"></i>
+
+                            <img src="{$index.face|default=$url}" alt="">
+
+                            <span class="login-status"><eq name='login_status' value='1'>{:L('ONLINE')}<else />{:L('OFFLINE')}</eq></span>
+
+                            <i class="iconfont icon-xiala"></i>
+
+                        </a>
+
+                        <div class="personal-panel">
+
+                            <ul>
+
+                                <li><a href="javascript:" onclick="changeLoginStatus('online')"><i class="iconfont icon-online green4"></i><span>{:L('ONLINE')}</span></a></li>
+
+                                <li><a href="javascript:" onclick="changeLoginStatus('offline')"><i class="iconfont icon-offline"></i><span>{:L('OFFLINE')}</span></a></li>
+
+                                <li id="logout"><a href="javascript:exit()"><i class="iconfont icon-tuichu"></i><span>{:L('EXIT')}</span></a></li>
+
+                            </ul>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- 左边导航 - 窄 -->
+            <div id='icon-menu' class="feeldesk-left-menu">
+
+                <div class="menu-item">
+
+                    <ul class="nav-ul-icon center">
+
+                        <php>
+
+                            if(in_array($index['company_id'],C('REPLACE_LOGO')))
+                            {
+                                $url = '__PUBLIC__/img/'.$index['company_id'].'/menu-logo-1.png';
+                            }
+                            else
+                            {
+                                $url = 'INDEX_IMG/menu-logo-1.png';
+                            }
+
+                        </php>
+
+                        <li class="menu-logo"><img src="{$url}" alt=""></li>
+
+                        <if condition="isset($ticketAuth) && $ticketAuth eq 1">
+
+                            <li class="ticket-menu">
+
+                                <a href="/u-home-base" target="rightMain" class="block iconfont icon-tickets" ></a>
+
+                            </li>
+
+                        </if>
+
+                        <if condition="isset($organizeAuth) && $organizeAuth eq 1">
+
+                            <li><a href="{:C('HTTP_PROTOCOL')}://{:C('HOST_DOMAIN')}/Organize/index?l={$lang}" target="rightMain" class="block iconfont icon-zuzhi"></a></li>
+
+                        </if>
+
+                        <if condition="isset($settingAuth) && $settingAuth eq 1">
+
+                            <li><a href="{:C('HTTP_PROTOCOL')}://{:C('HOST_DOMAIN')}/Setting/index?l={$lang}" target="rightMain" class="block iconfont icon-system"></a></li>
+
+                        </if>
+
+                    </ul>
+
+                </div>
+
+                <div class="left-shade"></div>
+
+            </div>
+
+            <!-- 左边导航 - 宽 -->
+            <div id='text-menu' class="feeldesk-left-menu hidden">
+
+                <div class="menu-item">
+
+                    <ul class="nav-ul-menu">
+
+                        <php>
+
+                            if(in_array($index['company_id'],C('REPLACE_LOGO')))
+                            {
+                                $url = '__PUBLIC__/img/'.$index['company_id'].'/menu-logo-2.png';
+                            }
+                            else
+                            {
+                                $url = 'INDEX_IMG/menu-logo-2.png';
+                            }
+
+                        </php>
+
+                        <li class="menu-logo center"><img src="{$url}" alt=""></li>
+
+                        <if condition="isset($ticketAuth) && $ticketAuth eq 1">
+
+                            <li class="ticket-menu">
+
+                                <a href="{:U('Index/Index/base')}" target="rightMain">
+
+                                    <i class="iconfont icon-tickets"></i>
+
+                                    <span>{:L('TICKET_MANAGER')}</span>
+
+                                </a>
+
+                            </li>
+
+                        </if>
+
+                        <if condition="isset($organizeAuth) && $organizeAuth eq 1">
+
+                            <li>
+
+                                <a href="{:C('HTTP_PROTOCOL')}://{:C('HOST_DOMAIN')}/Organize/index?l={$lang}" target="rightMain" class="block">
+
+                                    <i class="iconfont icon-zuzhi"></i>
+
+                                    <span>{:L('ORGANIZATION')}</span>
+
+                                </a>
+
+                            </li>
+
+                        </if>
+
+                        <if condition="isset($settingAuth) && $settingAuth eq 1">
+
+                            <li>
+
+                                <a href="{:C('HTTP_PROTOCOL')}://{:C('HOST_DOMAIN')}/Setting/index?l={$lang}" target="rightMain">
+
+                                    <i class="iconfont icon-system"></i>
+
+                                    <span>{:L('SYSTEM')}</span>
+
+                                </a>
+
+                            </li>
+
+                        </if>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <script src='__PUBLIC__/js/socket.io.js'></script>
+
+        <script type="text/javascript">
+
+            let socket;
+
+            let WebIM;
+
+            $(function ()
+            {
+                //SocketIo地址
+                socket = io("{:C('SOCKET_IO_URL')}");
+
+                const param = {uid: "{$index['member_id']}", cid: "{$index['company_id']}"};
+
+                // Socket连接后以uid登录
+                socket.on('connect', function ()
+                {
+                    socket.emit('login',param);
+                });
+
+                // Socket链接状态
+                socket.on('connect_status',function (data)
+                {
+                    console.log(data);
+                });
+
+                // Socket链接状态
+                socket.on('test',function (data)
+                {
+                    console.log(data);
+                });
+
+                // 后端推送来消息时
+                socket.on('new_msg', function (data)
+                {
+                    data = JSON.parse(data);
+
+                    let contentMini;
+
+                    if(data.category === 'crm_customer')
+                    {
+                        contentMini = 'msgCustomerDetail';
+                    }
+                    else if(data.category === 'crm_order')
+                    {
+                        contentMini = 'msgOrderDetail';
+                    }
+                    else if(data.category === 'crm_contract')
+                    {
+                        contentMini = 'msgContractDetail';
+                    }
+                    else if(data.category === 'crm_finance')
+                    {
+                        contentMini = 'msgCrmDetail';
+                    }
+                    else
+                    {
+                        contentMini = 'msgTicketDetail';
+                    }
+
+                    if(window.isclient === 'true')
+                    {
+                        chatcloud.notify(language.SYSTEM_MSG,data.title,"{:C('HTTP_PROTOCOL')}://{:C('HOST_DOMAIN')}/Public/img/logo.png");
+
+                        chatcloud.playsound (2);
+
+                        setTimeout(function ()
+                        {
+                            chatcloud.closeAll();
+                        },15000);
+
+                        const messageNumber = $('#msgNum');
+
+                        const old = parseInt(messageNumber.text());
+
+                        if(old < 99 && old !== 99)
+                        {
+                            messageNumber.removeClass('visibility').text(old + 1);
+                        }
+
+                        WebIM = {
+
+                            getNotify:function(contentMini)
+                            {
+                                chatcloud.openMainwnd();
+
+                                if(contentMini === 'msgTicketDetail')
+                                {
+                                    var actionAttr = data.url.split('/');
+
+                                    var ticket_id = actionAttr[actionAttr.length-1];
+
+                                    openTicketDetail(ticket_id,['69%','100%'],data.url);
+
+                                    changeMsg(false,true,data.id);
+
+                                    chatcloud.closeAll();
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        layer.open(
+                        {
+                            type: 1,
+                            title: language.SYSTEM_MSG,
+                            offset: 'rb',
+                            skin:'messageOpenWindow',
+                            shade:0,
+                            shift:2,
+                            time:30000,
+                            area: ['500px', '200px'],
+                            content: "<div style='padding:15px 10px'>"+data.title+"<a href='javascript:' action='"+data.url+"' mini='"+contentMini+"' class='blue ml10 msg-tan'>"+language.SEE+"</a></div>",
+                            success: function(layero)
+                            {
+                                var file = [];
+
+                                file['mp3'] = '/Public/js/msg.mp3';
+
+                                audioplayer('audioplane',file,false);
+
+                                var messageNumber = $('#msgNum');
+
+                                const old = parseInt(messageNumber.text());
+
+                                if(old < 99 && old !== 99)
+                                {
+                                    messageNumber.removeClass('visibility').text(old + 1);
+                                }
+
+                                layero.find('a.msg-tan').attr('onclick',"changeMsg(false,true,"+data.id+")");
+                            }
+                        });
+                    }
+
+                });
+
+                window.addEventListener('message', function(e)
+                {
+                    if(e.data)
+                    {
+                        top.socket.on('scheduleNum', function (data)
+                        {
+                            data = JSON.parse(data);
+
+                            document.querySelector("#right").contentWindow.postMessage(data.action, '*');
+                        });
+                    }
+                }, false)
+            });
+
+            //登录状态更新
+            const changeLoginStatus = function (status)
+            {
+                $.post("{:U('AjaxRequest/updateLoginStatus')}", {status: status}, function (data)
+                {
+                    if (data.errcode === 0)
+                    {
+                        $('.login-status-icon').removeClass('gray2 green4').addClass(data.color);
+
+                        $('.login-status').html(data.state);
+
+                        if (window.isclient === 'true') {
+                            chatcloud.setStaffState(data.value);
+                        }
+                    }
+                }, 'JSON');
+            };
+
+            //退出登录
+            const exit = function ()
+            {
+                layer.confirm(language.LOGOUT+'?',{icon: 3, offset:['15vw']},function()
+                {
+                    if(window.isclient === 'true')
+                    {
+                        chatcloud.exit();
+                    }
+                    else
+                    {
+                        window.location.href = '/u-logout';
+                    }
+                });
+            }
+
+            //刷新页面
+            const refresh = function ()
+            {
+                window.location.reload();
+            };
+
+            function switchMain()
+            {
+                $('#callcenter').hide();
+
+                $('#right').show();
+            }
+
+        </script>
+
+    </body>
+
+</html>

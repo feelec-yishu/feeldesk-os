@@ -1,0 +1,177 @@
+<extend name="Public:common"/>
+
+<block name="crumb1">{:L('ROUTE_CONFIG')}</block>
+
+<block name="content">
+
+    <div class="feeldesk-list">
+
+        <div class="feeldesk-list-header clearfix">
+
+            <div class="header-left">
+
+                <notempty name="data.auth.create">
+
+                    <a href="javascript:" onclick="openFormWindow(this,'{:U(\'create\')}')" class="createBtn" title="{:L('NEW_ROUTE')}">
+                        <i class="iconfont icon-xinzeng"></i>{:L('NEW_ROUTE')}
+                    </a>
+
+                </notempty>
+
+            </div>
+
+            <div class="header-right">
+
+                <form action="" class="layui-form ml15 fts14">
+
+                    <span>{:L('NOT_ROUTE_NOTE')} </span>
+
+                    <div class="layui-input-inline" id="departments" style="height: 35px;width: 260px"></div>
+
+                    <span> {:L('HANDLED')}</span>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="feeldesk-list-content">
+
+            <div class="feeldesk-list-main">
+
+                <table class="layui-table" lay-skin="nob">
+
+                    <thead>
+
+                        <tr>
+
+                            <th class="left">{:L('ROUTE_NAME')}</th>
+
+                            <th>{:L('ROUTE_RULE')}</th>
+
+                            <th>{:L('HANDLE_GROUP')}</th>
+
+                            <th>{:L('CREATE_TIME')}</th>
+
+                            <th>{:L('OPERATION')}</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <empty name="data.routes">
+
+                            <tr class="nodata center"><td colspan="5">{:L('NO_DATA')}</td></tr>
+
+                        <else />
+
+                            <volist name="data.routes" id="vo">
+
+                                <tr>
+
+                                    <td class="left">{$vo.route_name}</td>
+
+                                    <td>
+
+                                        <eq name="vo.channel" value="mail">{:L('ROUTE_RULE_MAIL')}</eq>
+
+                                        <eq name="vo.channel" value="template">{:L('ROUTE_RULE_TEMPLATE',['template'=>$templates[$vo['route_value']]['lang_name']])}</eq>
+
+                                    </td>
+
+                                    <td>{$data['groups'][$vo['group_id']]['group_name']}</td>
+
+                                    <td>{$vo.create_time|getDates}</td>
+
+                                    <td class="feeldesk-list-operate">
+
+                                        <i class="iconfont icon-dian"></i>
+
+                                        <div class="operate-panel hidden">
+
+                                            <php>$id = encrypt($vo['route_id'],'ROUTE');</php>
+
+                                            <notempty name="data.auth.editor">
+
+                                                <a href='javascript:' title="{:L('EDITOR')}" onclick="openFormWindow(this,'{:U(\'editor\',[\'id\'=>$id])}')">
+                                                    {:L('EDITOR')}
+                                                </a>
+
+                                            </notempty>
+
+                                            <notempty name="data.auth.delete">
+
+                                                <a href="{:U('delete',['id'=>$id])}" load="async">{:L('DELETE')}</a>
+
+                                            </notempty>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            </volist>
+
+                        </empty>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <notempty name="data.page"><div class="feeldesk-list-footer"><div class="user-page">{$data.page}</div></div></notempty>
+
+        </div>
+
+    </div>
+
+    <script type="text/javascript">
+
+        var jsonDepartmentData = JSON.parse('{$data.jsonDepartmentData}');
+
+        xmSelect.render({
+            el: '#departments',
+            tips:"{:L('SELECT_EXCL_SECTOR')} ({:L('PLEASE_ENTER_KEYWORDS')})",
+            model: { label: { type: 'text' } },
+            radio: true,
+            clickClose: true,
+            filterable:true,
+            theme: {
+                color: '#12c9cb'
+            },
+            searchTips:"{:L('PLEASE_ENTER_KEYWORDS')}",
+            tree: {
+                show: true,
+                strict: false,
+                indent: 20,
+                expandedKeys: true
+            },
+            height: 'auto',
+            initValue:['{$data.default_id}'],
+            prop: {
+                name: 'group_name',
+                value: 'group_id'
+            },
+            data:jsonDepartmentData,
+            on: function(data)
+            {
+                var id = data.arr[0].group_id;
+
+                $.post("{:U('AjaxRequest/updateDefaultGroup')}",{id:id},function(data)
+                {
+                    if(data.errcode !== 0)
+                    {
+                        feelDeskAlert(data.msg);
+                    }
+                })
+            }
+        })
+
+    </script>
+
+</block>

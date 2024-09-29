@@ -1,0 +1,153 @@
+<extend name="Public:common"/>
+
+<block name="crumb1">{:L('TICKET_SETTING')}</block>
+
+<block name="content">
+
+    <div class="feeldesk-list">
+
+        <div class="feeldesk-list-header clearfix">
+
+            <div class="header-left">
+
+                <notempty name="data.auth.create">
+
+                    <a href="javascript:" onclick="openFormWindow(this,'{:U(\'create\')}')" class="createBtn" title="{:L('ADD_TEMP_TYPE')}">
+                        <i class="iconfont icon-xinzeng"></i>{:L('ADD_TEMP_TYPE')}
+                    </a>
+
+                </notempty>
+
+            </div>
+
+            <div class="header-right">
+
+                <form action="{$controllerAndAction}" method="get" class="fr">
+
+                    <div class="compact-search">
+
+                        <i class="iconfont icon-search"></i>
+
+                        <input type="text" name="keyword" value="{$keyword}" placeholder="{:L('TYPE_NAME')}"/>
+
+                        <a href="javascript:" class="searchBtn">{:L('SEARCH')}</a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="feeldesk-list-content">
+
+            <div class="feeldesk-list-main">
+
+                <table class="layui-table" lay-skin="nob">
+
+                    <thead>
+
+                        <tr>
+
+                            <th class="left">{:L('TYPE_NAME')}</th><th>{:L('IS_ENABLE')}</th><th>{:L('TEMP_APPLY')}</th><th>{:L('CREATE_TIME')}</th><th>{:L('OPERATION')}</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <empty name="data.templateType">
+
+                            <tr class="nodata center">
+
+                                <td colspan="5">
+
+                                    <p><i class="iconfont icon-nothing fts20"></i></p>
+
+                                    <p>{:L('NO_DATA')}</p>
+
+                                </td>
+
+                            </tr>
+
+                        <else />
+
+                            <volist name="data.templateType" id="vo">
+
+                                <tr>
+
+                                    <td class="left">{:getHighLight($keyword,$vo['lang_name'])}</td>
+
+                                    <td>
+
+                                        <eq name="vo.closed" value="1">
+
+                                            <span class="open-status disable">{:L('DISABLE')}</span>
+
+                                        <else />
+
+                                            <span class="open-status enable">{:L('ENABLE')}</span>
+
+                                        </eq>
+
+                                    </td>
+
+                                    <td>
+
+                                        <eq name="vo.apply" value="external"><span class="violet3">{:L('TEMP_EXTERNAL')}</span></eq>
+
+                                        <eq name="vo.apply" value="inside"><span class="blue5">{:L('TEMP_INSIDE')}</span></eq>
+
+                                        <eq name="vo.apply" value="currency"><span class="green3">{:L('TEMP_CURRENCY')}</span></eq>
+
+                                    </td>
+
+                                    <td>{$vo.create_time|getDates}</td>
+
+                                    <td class="feeldesk-list-operate">
+
+                                        <i class="iconfont icon-dian"></i>
+
+                                        <div class="operate-panel hidden">
+
+                                            <php>$id = encrypt($vo['type_id'],'TEMPLATETYPE');</php>
+
+                                            <notempty name="data.auth.editor">
+
+                                                <a href='javascript:' title="{:L('EDITOR')}" onclick="openFormWindow(this,'{:U(\'editor\',[\'id\'=>$id])}')">
+                                                    {:L('EDITOR')}
+                                                </a>
+
+                                            </notempty>
+
+                                            <if condition="$data['auth']['delete'] && $vo['closed'] eq 1">
+
+                                                <a href="{:U('delete',['id'=>$id])}" load="async">{:L('DELETE')}</a>
+
+                                            </if>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            </volist>
+
+                        </empty>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <notempty name="data.page"><div class="feeldesk-list-footer"><div class="user-page">{$data.page}</div></div></notempty>
+
+        </div>
+
+    </div>
+
+</block>

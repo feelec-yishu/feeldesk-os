@@ -1,0 +1,254 @@
+<extend name="Public:common"/>
+
+<block name="crumb1">{:L('TICKET_SETTING')}</block>
+
+<block name="content">
+
+    <div class="feeldesk-list">
+
+        <div class="feeldesk-list-header clearfix">
+
+            <div class="header-left">
+
+                {:FEELDESK('ticketForm/create',['tid'=>encrypt($ticket_model_id,'TICKETMODEL')],L('NEW_FORM'),'createBtn','','iconfont icon-xinzeng')}
+
+            </div>
+
+            <div class="header-right">
+
+                <form action="{$controllerAndAction}" method="get" class="fr">
+
+                    <input type="hidden" name="tid" value="{:encrypt($ticket_model_id,'TICKETMODEL')}" />
+
+                    <div class="compact-search">
+
+                        <i class="iconfont icon-search"></i>
+
+                        <input type="text" name="keyword" value="{$keyword}" placeholder="{:L('NAME/TYPE')}"/>
+
+                        <a href="javascript:" class="searchBtn">{:L('SEARCH')}</a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="feeldesk-list-content">
+
+            <div class="feeldesk-list-main">
+
+                <table class="layui-table" lay-skin="nob" id='sortable'>
+
+                    <thead>
+
+                    <tr>
+
+                        <th class="left">{:L('FIELD_NAME')}</th><th>{:L('FORM_NAME')}</th><th>{:L('FORM_TYPE')}</th><th>{:L('FORM_OPTION')}</th><th>{:L('IS_NOT_REQUIRED')}</th>
+                        <th>{:L('IS_ENABLE')}</th><th>{:L('SORT')}</th><th>{:L('OPERATION')}</th>
+
+                    </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    <empty name="ticketform">
+
+                        <tr class="nodata center"><td colspan="8">{:L('NO_DATA')}</td></tr>
+
+                        <else />
+
+                        <volist name="ticketform" id="vo">
+
+                            <tr class='cursor-move' sort="{$vo.orderby}">
+
+                                <td class="left">{$vo.ticket_form_name}</td>
+
+                                <td>{$vo.ticket_form_description}</td>
+
+                                <td>{$vo.ticket_form_type}</td>
+
+                                <td>{$vo.ticket_form_option|default="--"}</td>
+
+                                <td><eq name="vo.is_required" value="0"><span class="red1">{:L('YES')}</span><else /><span class="green1">{:L('NO')}</span></eq></td>
+
+                                <td>
+
+                                    <eq name="vo.closed" value="1">
+
+                                        <span class="open-status disable">{:L('DISABLE')}</span>
+
+                                        <else />
+
+                                        <span class="open-status enable">{:L('ENABLE')}</span>
+
+                                    </eq>
+
+                                </td>
+
+                                <td><span>{$vo.orderby}</span></td>
+
+                                <td class="feeldesk-list-operate">
+
+                                    <i class="iconfont icon-dian"></i>
+
+                                    <div class="operate-panel hidden">
+
+                                        {:FEELDESK('ticketForm/edit',['id'=>encrypt($vo['ticket_form_id'],'TICKETFORM'),'tid'=>encrypt($vo['ticket_model_id'],'TICKETMODEL'),],l('EDITOR'))}
+
+                                        {:FEELDESK('ticketForm/delete',['id'=>encrypt($vo['ticket_form_id'],'TICKETFORM')],l('DELETE'),'','async')}
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        </volist>
+
+                    </empty>
+
+                    </tbody>
+
+                </table>
+
+                <notempty name="page">
+
+                    <div class="right-list-page clearfix"><div class="feeldesk-page">{$page}</div></div>
+
+                </notempty>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script type="text/javascript">
+
+        var fixHelper = function(e, ui)
+        {
+            ui.children().each(function()
+            {
+                $(this).width($(this).width());  //在拖动时，拖动行的cell（单元格）宽度会发生改变。在这里做了处理就没问题了   
+            });
+
+            return ui;
+        };
+
+        $(function()
+        {
+            var sortable = $( "#sortable");
+
+            var formIds = [];//受影响的表单ID
+
+            var selectSort,selectSx,placeSort,placeSx,temp,flag;
+
+            sortable.find('tbody').sortable(
+                {
+                    cursor: "move",
+                    helper: fixHelper,                  //调用fixHelper
+                    axis:"y",
+                    start:function(e, ui)
+                    {
+                        ui.helper.css({"background":"#fff"});  //拖动时的行，要用ui.helper
+                        return ui;
+                    },
+                    sort:function(e, ui)
+                    {
+                        formIds = [];
+
+                        selectSort = ui.item.attr("sort"); //当前元素的顺序
+
+                        placeSort = $(this).find('tr').filter('.ui-sortable-placeholder').next('tr').attr('sort');//新位置下的下一个元素的排序
+
+                        placeSx = parseInt(placeSort);
+
+                        selectSx = parseInt(selectSort);
+
+//                    说明是 向上移动
+                        if(selectSx > placeSx)
+                        {
+                            temp = placeSort;
+
+                            placeSx = selectSort;//最大
+
+                            selectSx = temp;//最小
+
+                            flag = false;
+                        }
+                        else
+                        {
+//                        向下移动
+                            placeSort = $(this).find('tr').filter('.ui-sortable-placeholder').prev('tr').attr('sort');
+
+                            placeSx = parseInt(placeSort);
+
+                            flag = true;
+                        }
+                    },
+                    stop:function(e, ui)
+                    {
+                        var temp = "";
+
+                        var ticketForm = JSON.parse('{$ticketFormJson}');
+
+                        $.each(ticketForm,function(k,v)
+                        {
+                            var sort = parseInt(v.orderby);
+
+                            if(sort >= selectSx && sort <= placeSx)
+                            {
+                                if(sort == parseInt(selectSort))
+                                {
+                                    if(flag)
+                                    {
+                                        temp = v.ticket_form_id;
+                                    }
+                                    else
+                                    {
+                                        formIds.splice(0,0,v.ticket_form_id);
+                                    }
+                                }
+                                else
+                                {
+                                    formIds.push(v.ticket_form_id);
+                                }
+                            }
+                        });
+
+                        if(flag)
+                        {
+                            formIds.splice(placeSx-selectSx,0,temp);
+                        }
+
+                        $.ajax(
+                            {
+                                url:'/AjaxRequest/updateSort?name=ticket_form&field=orderby&key=ticket_form_id',
+                                type:'POST',
+                                async: false,
+                                data:{'ids':formIds, selectSx:selectSx, placeSx:placeSx},
+                                datatype:'json',
+                                success:function()
+                                {
+                                    window.location.reload();
+                                },
+                                error:function()
+                                {
+                                    feelDeskAlert("保存排序异常");
+                                }
+                            });
+
+                        return ui;
+                    }
+                });
+
+            sortable.disableSelection();
+        });
+
+    </script>
+
+</block>

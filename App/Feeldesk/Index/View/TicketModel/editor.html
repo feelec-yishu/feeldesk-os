@@ -1,0 +1,280 @@
+<extend name="Public:window"/>
+
+<block name="window-form">
+
+    <form action="" class="layui-form">
+
+        <div class="form-item">
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('TEMP_TYPE')}</label>
+
+                <div class="layui-input-inline">
+
+                    <select name="ticket_model[type_id]">
+
+                        <option value="0">{:L('SELECT_TEMP_TYPE')}</option>
+
+                        <foreach name="category" item="val">
+
+                            <option value="{$val.type_id}" <eq name='val.type_id' value='$detail.type_id'> selected="selected"</eq>>{$val.lang_name}</option>
+
+                        </foreach>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('TEMP_NAME')}</label>
+
+                <div class="layui-input-inline">
+
+                    <input type="text" name="ticket_model[ticket_model_name]" value="{$detail.ticket_model_name}" placeholder="{:L('ENTER_TEMPLATE_NAME')}" class="layui-input">
+
+                </div>
+
+            </div>
+
+            <eq name="langAuth['en_auth']" value="10">
+
+                <div class="layui-form-item">
+
+                    <label class="layui-form-label">English name</label>
+
+                    <div class="layui-input-inline">
+
+                        <input type="text" name="ticket_model[name_en]" value="{$detail.name_en}" placeholder="Enter English name" class="layui-input">
+
+                    </div>
+
+                </div>
+
+            </eq>
+
+            <eq name="langAuth['jp_auth']" value="10">
+
+                <div class="layui-form-item">
+
+                    <label class="layui-form-label">日本語名</label>
+
+                    <div class="layui-input-inline">
+
+                        <input type="text" name="ticket_model[name_jp]" value="{$detail.name_jp}" placeholder="日本語名を入力してください" class="layui-input">
+
+                    </div>
+
+                </div>
+
+            </eq>
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('SORT')}</label>
+
+                <div class="layui-input-inline">
+
+                    <input type="text" name="ticket_model[sort]" value="{$detail.sort}" placeholder="{:L('SORT')}" class="layui-input">
+
+                </div>
+
+            </div>
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('CC_COMPONENTS')}</label>
+
+                <div class="layui-input-inline w-auto">
+
+                    <input type="radio" name="ticket_model[cc_discrete]" value="10" title="{:L('OPEN')}" <eq name="detail.cc_discrete" value="10"> checked</eq>>
+
+                    <input type="radio" name="ticket_model[cc_discrete]" value="20" title="{:L('CLOSE')}" <eq name="detail.cc_discrete" value="20"> checked</eq>>
+
+                </div>
+
+                <i class="layui-icon layui-icon-about intro-icon" data-note="{:L('CC_COMPONENTS_NOTE')}"></i>
+
+            </div>
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('MOBILE_COMPONENTS')}</label>
+
+                <div class="layui-input-inline w-auto">
+
+                    <input lay-filter='mobile_required' type="radio" name="ticket_model[mobile_discrete]" value='10' title="{:L('OPEN')}" <eq name="detail.mobile_discrete" value="10"> checked</eq>>
+
+                    <input lay-filter='mobile_required' type="radio" name="ticket_model[mobile_discrete]" value='20' title="{:L('CLOSE')}" <eq name="detail.mobile_discrete" value="20"> checked</eq>>
+
+                </div>
+
+                <i class="layui-icon layui-icon-about intro-icon" data-note="{:L('MOBILE_COMPONENTS_NOTE')}"></i>
+
+            </div>
+
+            <div id='mobileRequired' class="layui-form-item <eq name='detail.mobile_discrete' value='20'>hidden</eq>">
+
+                <label class="layui-form-label">{:L('IS_NOT_REQUIRED')}</label>
+
+                <div class="layui-input-inline w-auto">
+
+                    <input type="radio" name="ticket_model[mobile_required]" value='10' title="{:L('YES')}" <eq name="detail.mobile_required" value="10"> checked</eq>>
+
+                    <input type="radio" name="ticket_model[mobile_required]" value='20' title="{:L('NO')}" <eq name="detail.mobile_required" value="20"> checked</eq>>
+
+                </div>
+
+            </div>
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('MAIL_COMPONENTS')}</label>
+
+                <div class="layui-input-inline w-auto">
+
+                    <input lay-filter="mail_required" type="radio" name="ticket_model[mail_discrete]" value='10' title="{:L('OPEN')}" <eq name="detail.mail_discrete" value="10"> checked</eq>>
+
+                    <input lay-filter='mail_required' type="radio" name="ticket_model[mail_discrete]" value='20' title="{:L('CLOSE')}" <eq name="detail.mail_discrete" value="20"> checked</eq>>
+
+                </div>
+
+                <i class="layui-icon layui-icon-about intro-icon" data-note="{:L('MAIL_COMPONENTS_NOTE')}"></i>
+
+            </div>
+
+            <div id='mailRequired' class="layui-form-item <eq name='detail.mail_discrete' value='20'>hidden</eq>">
+
+                <label class="layui-form-label">{:L('IS_NOT_REQUIRED')}</label>
+
+                <div class="layui-input-inline w-auto">
+
+                    <input type="radio" name="ticket_model[mail_required]" value='10' title="{:L('YES')}" <eq name="detail.mail_required" value="10"> checked</eq>>
+
+                    <input type="radio" name="ticket_model[mail_required]" value='20' title="{:L('NO')}" <eq name="detail.mail_required" value="20"> checked</eq>>
+
+                </div>
+
+            </div>
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('DEADLINES_COMPONENTS')}</label>
+
+                <div class="layui-input-inline w-auto">
+
+                    <input type="radio" name="ticket_model[deadlines_discrete]" value="10" title="{:L('OPEN')}" <eq name="detail.deadlines_discrete" value="10"> checked</eq>>
+
+                    <input type="radio" name="ticket_model[deadlines_discrete]" value="20" title="{:L('CLOSE')}" <eq name="detail.deadlines_discrete" value="20"> checked</eq>>
+
+                </div>
+
+                <i class="layui-icon layui-icon-about intro-icon" data-note="{:L('DEADLINES_COMPONENTS_NOTE')}"></i>
+
+            </div>
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('EARMARK_HANDLE')}</label>
+
+                <div class="layui-input-inline w-auto">
+
+                    <input type="radio" name="ticket_model[handle_discrete]" value="10" title="{:L('OPEN')}" <eq name="detail.handle_discrete" value="10"> checked</eq>>
+
+                    <input type="radio" name="ticket_model[handle_discrete]" value="20" title="{:L('CLOSE')}" <eq name="detail.handle_discrete" value="20"> checked</eq>>
+
+                </div>
+
+                <i class="layui-icon layui-icon-about intro-icon" data-note="{:L('EARMARK_HANDLE_NOTE')}"></i>
+
+            </div>
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('AREA_COMPONENTS')}</label>
+
+                <div class="layui-input-inline w-auto">
+
+                    <input type="radio" name="ticket_model[area_discrete]" value="10" title="{:L('OPEN')}" <eq name="detail.area_discrete" value="10"> checked</eq>>
+
+                    <input type="radio" name="ticket_model[area_discrete]" value="20" title="{:L('CLOSE')}" <eq name="detail.area_discrete" value="20"> checked</eq>>
+
+                </div>
+
+                <i class="layui-icon layui-icon-about intro-icon" data-note="{:L('AREA_COMPONENTS_NOTE')}"></i>
+
+            </div>
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('IS_ENABLE')}</label>
+
+                <div class="layui-input-inline" title="{:L('TEMPLATE_ENABLE_NOTE')}">
+
+                    <input type="checkbox" name="ticket_model[closed]" lay-skin="switch" <eq name="detail.closed" value="0"> checked</eq>>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="form-submit">
+
+            <div class="layui-form-item">
+
+                <div class="layui-input-inline">
+
+                    <a href="javascript:" class="layui-btn layui-btn-normal" id="submitForm">{:L('SUBMIT')}</a>
+
+                    <a href="javascript:" class="layui-btn layui-btn-normal cancel-btn" id="cancel-form">{:L('CANCEL')}</a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+    <script type="text/javascript">
+
+        layui.use('form', function ()
+        {
+            var form = layui.form;
+
+            form.on('radio(mobile_required)',function(data)
+            {
+                if(data.value == 10)
+                {
+                    $('#mobileRequired').slideDown('fast');
+                }
+                else
+                {
+                    $('#mobileRequired').slideUp('fast').find("input[value='20']").prop('checked',true);
+
+                    form.render();
+                }
+            });
+
+            form.on('radio(mail_required)',function(data)
+            {
+                if(data.value == 10)
+                {
+                    $('#mailRequired').slideDown('fast');
+                }
+                else
+                {
+                    $('#mailRequired').slideUp('fast').find("input[value='20']").prop('checked',true);
+
+                    form.render();
+                }
+            })
+        })
+
+    </script>
+
+</block>

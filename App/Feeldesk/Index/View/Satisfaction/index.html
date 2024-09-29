@@ -1,0 +1,266 @@
+<extend name="Public:common"/>
+
+<block name="crumb1">{:L('SATISFY')}</block>
+
+<block name="content">
+
+    <div class="satisfaction fts0">
+
+        <div class="satisfy-left">
+
+            <ul class="fts0">
+
+                <volist name="satisfaction" id="vo">
+
+                    <li class="satisfy-item <eq name='i' value='1'>current</eq>" onclick="getSatisfyLabel(this,'{$vo.satisfy_id}')">
+                        <span>{$vo.lang_name}</span> <i class="iconfont icon-edit" onclick="editorSatisfy(this,'{$vo.satisfy_id}')"></i>
+                    </li>
+
+                </volist>
+
+            </ul>
+
+        </div>
+
+        <div class="satisfy-right"><div class="satisfy-label" id="satisfyLabel"></div></div>
+
+    </div>
+
+    <script type="text/javascript">
+
+        $(function()
+        {
+            var id = "{$satisfaction[0]['satisfy_id']}";
+
+            getSatisfyLabel('',id);
+        });
+
+        var editorSatisfy = function(t,id)
+        {
+            var e = window.event || arguments.callee.caller.arguments[0];
+
+            e.stopPropagation();
+
+            var satisfyItem = $(t).parent('.satisfy-item');
+
+            var satisfy_name = satisfyItem.find('span').text();
+
+            var satisfy = satisfyItem.html();
+
+            var formSatisfy = "<input type='text' name='satisfy_name' value='"+satisfy_name+"' autocomplete='off'/>" +
+                    "<a class='satisfy-sure' data-id='"+id+"'>{:L('SURE')}</a>" +
+                    "<a class='satisfy-cancel'>{:L('CANCEL')}</a>";
+
+            satisfyItem.addClass('satisfy-form').html(formSatisfy);
+
+//            获取焦点阻止冒泡 - 阻止右侧刷新
+            $("input[name='satisfy_name']").unbind('click').on('click',function(e)
+            {
+                e.stopPropagation();
+            });
+
+//            取消阻止冒泡 - 阻止右侧刷新
+            $('.satisfy-cancel').unbind('click').on('click',function(e)
+            {
+                e.stopPropagation();
+
+                satisfyItem.removeClass('satisfy-form').html(satisfy);
+            });
+
+//            提交阻止冒泡 - 阻止右侧刷新
+            $('.satisfy-sure').unbind('click').on('click',function(e)
+            {
+                e.stopPropagation();
+
+                var o = $(this);
+
+                var id = o.data('id');
+
+                var name = o.prev('input').val();
+
+                var loading = layer.load(2);
+
+                $.post('editor_satisfy',{satisfy_id:id,name:name},function(result)
+                {
+                    var satisfy = "<span>"+name+"</span> <i class='iconfont icon-edit' onclick='editorSatisfy(this,"+id+")></i>";
+
+                    if(result.code == 0)
+                    {
+                        o.parent('.satisfy-item').removeClass('satisfy-form').html(satisfy);
+                    }
+                    else
+                    {
+                        feelDeskAlert(result.msg);
+                    }
+
+                    layer.close(loading);
+                });
+            })
+        };
+
+        var getSatisfyLabel = function(t,id)
+        {
+            $(t).addClass('current').siblings('li').removeClass('current');
+
+            var loading = "<div class='loading'><i class='layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop'></i></div>";
+
+            $('#satisfyLabel').html(loading);
+
+            $.post('label_list',{satisfy_id:id},function(result)
+            {
+                if(result.code == 0)
+                {
+                    var labels = '';
+
+                    if(result.data.length > 0)
+                    {
+                        $.each(result.data,function(k,v)
+                        {
+                            labels += "<div class='label-item'>" +
+                                        "<div class='label-name'>"+ v.label_name +"</div>" +
+                                        "<div class='label-operation'>" +
+                                            "<a onclick='editorLabel(this,"+ v.label_id +")'>{:L('EDITOR')}</a>" +
+                                            "<a onclick='deleteLabel(this,"+ v.label_id +")'>{:L('DELETE')}</a>" +
+                                        "</div>" +
+                                      "</div>";
+                        });
+
+                        labels += "<div class='label-item add-label' onclick='addLabel(this,"+id+")'><i class='iconfont icon-zengjia'></i> <span class='middle'>{:L('ADD_LABEL')}</span></div>";
+                    }
+                    else
+                    {
+                        labels = "<div class='label-item add-label' onclick='addLabel(this,"+id+")'><i class='iconfont icon-zengjia'></i> <span class='middle'>{:L('ADD_LABEL')}</span></div>";
+                    }
+
+                    $('#satisfyLabel').html(labels);
+                }
+            })
+        };
+
+        var addLabel = function(t,id)
+        {
+            var item = "<div class='label-item label-form'>" +
+                    "<input type='text' name='label-name' value=''><a href='javascript:' class='add-sure'>{:L('SURE')}</a>" +
+                    "<a href='javascript:' class='cancel' onclick='removeLabel(this)'>{:L('CANCEL')}</a>" +
+                    "</div>";
+
+            $(t).before(item);
+
+            $('.add-sure').unbind('click').on('click',function()
+            {
+                var o = $(this);
+
+                var name = o.prev('input').val();
+
+                var loading = layer.load(2);
+
+                $.post('create_label',{satisfy_id:id,name:name},function(result)
+                {
+                    if(result.code == 0)
+                    {
+                        var label = "<div class='label-item'>" +
+                                "<div class='label-name'>"+ name +"</div>" +
+                                "<div class='label-operation'>" +
+                                "<a onclick='editorLabel(this,"+ result.label_id +")'>{:L('EDITOR')}</a>" +
+                                "<a onclick='deleteLabel(this,"+ result.label_id +")'>{:L('DELETE')}</a>" +
+                                "</div>" +
+                                "</div>";
+
+                        $(t).before(label);
+
+                        o.parent('.label-item').remove();
+                    }
+                    else
+                    {
+                        feelDeskAlert(result.msg);
+                    }
+
+                    layer.close(loading);
+                })
+            })
+        };
+
+        var removeLabel = function(t)
+        {
+           $(t).parents('.label-item').remove();
+        };
+
+        var editorLabel = function(t,id)
+        {
+            var labelItem = $(t).parents('.label-item');
+
+            var label = labelItem.html();
+
+            var label_name = labelItem.find('.label-name').text();
+
+//            表单
+            var formLabel = "<input type='text' name='label-name' value='"+ label_name +"'>" +
+                            "<a href='javascript:' class='edit-sure' data-id='"+id+"'>{:L('SURE')}</a>" +
+                            "<a href='javascript:' class='edit-cancel'>{:L('CANCEL')}</a>";
+
+            labelItem.addClass('label-form').html(formLabel);
+
+            $('.edit-cancel').unbind('click').on('click',function()
+            {
+                labelItem.removeClass('label-form').html(label);
+            });
+
+            $('.edit-sure').unbind('click').on('click',function()
+            {
+                var o = $(this);
+
+                var id = o.data('id');
+
+                var name = o.prev('input').val();
+
+                var loading = layer.load(2);
+
+                $.post('editor_label',{label_id:id,name:name},function(result)
+                {
+                    var label = "<div class='label-name'>"+ name +"</div>" +
+                            "<div class='label-operation'>" +
+                            "<a onclick='editorLabel(this,"+ id +")'>{:L('EDITOR')}</a>" +
+                            "<a onclick='deleteLabel(this,"+ id +")'>{:L('DELETE')}</a>" +
+                            "</div>";
+
+                    if(result.code == 0)
+                    {
+                        o.parent('.label-item').removeClass('label-form').html(label);
+                    }
+                    else
+                    {
+                        feelDeskAlert(result.msg);
+                    }
+
+                    layer.close(loading);
+                })
+            })
+        };
+
+        var deleteLabel = function(t,id)
+        {
+            layer.confirm("{:L('SURE_DELETE_LABEL')}",{offset:['150px']},function(index)
+            {
+                var loading = layer.load(2);
+
+                $.post('delete_label',{label_id:id},function(result)
+                {
+                    layer.close(index);
+
+                    if(result.code == 0)
+                    {
+                        removeLabel(t);
+                    }
+                    else
+                    {
+                        feelDeskAlert(result.msg);
+                    }
+
+                    layer.close(loading);
+                })
+            });
+        }
+
+    </script>
+
+</block>

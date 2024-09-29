@@ -1,0 +1,178 @@
+<extend name="Public:window"/>
+
+<block name="window-form">
+
+    <form action="" class="layui-form">
+
+        <div class="form-item">
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('STATUS_NAME')}</label>
+
+                <div class="layui-input-inline">
+
+                    <input type="text" name="ticket_status[status_name]" value="{$detail.status_name}" id="status_name" style="<notempty name='detail.status_color'>color:{$detail.status_color}</notempty>" class="layui-input" placeholder="{:L('ENTER_STATUS_NAME')}" />
+
+                </div>
+
+            </div>
+
+            <eq name="langAuth['en_auth']" value="10">
+
+                <div class="layui-form-item">
+
+                    <label class="layui-form-label">English name</label>
+
+                    <div class="layui-input-inline">
+
+                        <input type="text" name="ticket_status[name_en]" value="{$detail.name_en}" id="name_en" style="<notempty name='detail.status_color'>color:{$detail.status_color}</notempty>" class="layui-input" placeholder="Enter English name" />
+
+                    </div>
+
+                </div>
+
+            </eq>
+
+            <eq name="langAuth['jp_auth']" value="10">
+
+                <div class="layui-form-item">
+
+                    <label class="layui-form-label">日本語名</label>
+
+                    <div class="layui-input-inline">
+
+                        <input type="text" name="ticket_status[name_jp]" value="{$detail.name_jp}" id="name_jp" style="<notempty name='detail.status_color'>color:{$detail.status_color}</notempty>" class="layui-input" placeholder="日本語名を入力してください" />
+
+                    </div>
+
+                </div>
+
+            </eq>
+
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">{:L('STATUS_COLOR')}</label>
+
+                <div class="layui-input-inline">
+
+                    <input type="hidden" name="ticket_status[status_color]" value="{$detail.status_color}" id="colors" class="layui-input" placeholder="{:L('SELECT_STATUS_COLOR')}" style="<notempty name='detail.status_color'>color:{$detail.status_color}</notempty>"/>
+
+                    <ul class='ticket-status-color'>
+
+                        <php>
+
+                            $status_color = str_replace('#','',$detail['status_color']);
+
+                        </php>
+
+                        <li class="status-color-panel status-e03636 <eq name='status_color' value='e03636'>current</eq>"></li>
+
+                        <li class="status-color-panel status-3290f9 <eq name='status_color' value='3290f9'>current</eq>"></li>
+
+                        <li class="status-color-panel status-ff8911 <eq name='status_color' value='ff8911'>current</eq>"></li>
+
+                        <li class="status-color-panel status-febc08 <eq name='status_color' value='febc08'>current</eq>"></li>
+
+                        <li class="status-color-panel status-b8d900 <eq name='status_color' value='b8d900'>current</eq>"></li>
+
+                        <li class="status-color-panel status-6c5ac9 <eq name='status_color' value='6c5ac9'>current</eq>"></li>
+
+                        <li class="status-color-panel status-9c2189 <eq name='status_color' value='9c2189'>current</eq>"></li>
+
+                        <li class="status-color-panel status-00b5ad <eq name='status_color' value='00b5ad'>current</eq>"></li>
+
+                    </ul>
+
+                </div>
+
+                <i class="layui-icon layui-icon-about intro-icon" data-note="{:L('STATUS_COLOR_NOTE')}"></i>
+
+            </div>
+
+            <if condition="$detail['is_first'] eq 2 && $detail['is_end'] eq 2">
+
+                <div class="layui-form-item">
+
+                    <label class="layui-form-label">{:L('STATUS_SORT')}</label>
+
+                    <div class="layui-input-inline">
+
+                        <input type="text" name="ticket_status[sort]" value="{$detail.sort}"  class="layui-input" placeholder="{:L('STATUS_SORT_NOTE')}" />
+
+                    </div>
+
+                    <i class="layui-icon layui-icon-about intro-icon" data-note="{:L('STATUS_SORT_NOTE')}"></i>
+
+                </div>
+
+                <div class="layui-form-item">
+
+                    <label class="layui-form-label">{:L('IS_STOP_TIMING')}</label>
+
+                    <div class="layui-input-inline w-auto">
+
+                        <input type="radio" name="ticket_status[is_stop_timing]" value="10" title="{:L('YES')}" <eq name="detail['is_stop_timing']" value="10">checked</eq>>
+
+                        <input type="radio" name="ticket_status[is_stop_timing]" value="20" title="{:L('NO')}" <eq name="detail['is_stop_timing']" value="20">checked</eq>>
+
+                    </div>
+
+                </div>
+
+            </if>
+
+        </div>
+
+        <div class="form-submit">
+
+            <div class="layui-form-item">
+
+                <div class="layui-input-inline">
+
+                    <a href="javascript:" class="layui-btn layui-btn-normal" id="submitForm">{:L('SUBMIT')}</a>
+
+                    <a href="javascript:" class="layui-btn layui-btn-normal cancel-btn" id="cancel-form">{:L('CANCEL')}</a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+    <script type="text/javascript">
+
+        $('.ticket-status-color').find('li').on('click',function()
+        {
+            $(this).addClass('current').siblings().removeClass('current');
+
+            var rgb = $(this).css('background-color');
+
+            var color = '';
+
+            if(rgb >= 0)
+            {
+                color = rgb;
+            }
+            else
+            {
+                rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+
+                function hex(x)
+                {
+                    {return ("0" + parseInt(x).toString(16)).slice(-2);}
+                }
+
+                color = "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+            }
+
+            $("#status_name,#name_en,#name_jp").css("color",color+' !important');
+
+            $('#colors').val(color);
+        })
+
+    </script>
+
+</block>

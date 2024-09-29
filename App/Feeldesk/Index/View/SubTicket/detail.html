@@ -1,0 +1,552 @@
+<include file="Public/header" />
+
+<link rel="stylesheet" type="text/css" href="INDEX_PUBLIC_CSS/ticket-detail.css"/>
+
+<link rel="stylesheet" href="__PUBLIC__/js/layui/extends/dtree/dtree.css">
+
+<link rel="stylesheet" href="__PUBLIC__/js/layui/extends/dtree/font/dtreefont.css">
+
+<style type="text/css">
+
+    .layui-form-select dl dd.layui-this {background-color: rgba(254,115,0,0.05);color: #40485b;}
+
+</style>
+
+<div class="ticket-detail">
+
+    <div class="ticket-detail-content <neq name='ticket.allow_reply' value='1'>pb0</neq>">
+
+        <div class="detail-sidebar sidebar" id="closeTicketDetail"><i class="iconfont icon-right"></i></div>
+
+        <!-- 标题栏 -->
+        <div class="detail-header clearfix">
+
+            <ul>
+
+                <!-- 父级工单 -->
+                <li>{:L('PARENT_TICKET')}：<a href="{:U('Ticket/detail',['id'=>encrypt($ticket['parent_id'],'TICKET')])}">{$ticket['parent_ticket_title']}</a></li>
+
+                <!-- 工单编号 -->
+                <li>{:L('TICKET_ID')}：<span>{$ticket['ticket_no']}</span></li>
+
+                <!-- 工单状态 -->
+                <li class="select select-status" id="selectStatus">
+
+                    {:L('TICKET_STATUS')}：
+
+                    <eq name="ticket.status_id" value="10">
+
+                        <span class="status-color red1" id="currentStatus">{:L('WAIT_PROCESS')}</span>
+
+                        <if condition="in_array($index['member_id'],[$ticket['member_id'],$ticket['process_id']])">
+
+                            <!-- 修改状态：工单未完成且当前登录用户是工单发布人或处理人 -->
+                            <i class="layui-icon fts12">&#xe625;</i>
+
+                            <div class="select-item status-item ptb0 hidden">
+
+                                <form class="layui-form">
+
+                                    <div class="layui-input-block select-priority mar0">
+
+                                        <div class="layui-form-select">
+
+                                            <div class="layui-select-title center border_b">{:L('SELECT_TICKET_STATUS')}</div>
+
+                                            <dl class="layui-anim layui-anim-upbit update-status" data-value="{:encrypt($ticket['ticket_id'],'SUB_TICKET')}">
+
+                                                <dd data-value="10" class="pr10 relative"><span class="red1">{:L('WAIT_PROCESS')}</span></dd>
+
+                                                <dd data-value="20" class="pr10 relative"><span class="green4">{:L('COMPLETED')}</span></dd>
+
+                                            </dl>
+
+                                        </div>
+
+                                    </div>
+
+                                </form>
+
+                            </div>
+
+                        </if>
+
+                    <else />
+
+                        <span class="status-color green4">{:L('COMPLETED')}</span>
+
+                    </eq>
+
+                </li>
+
+                <!-- 发布人 -->
+                <li>
+
+                    {:L('PUBLISHER')}：
+
+                    <img src="{$ticket['members'][$ticket['member_id']]['face']|default='/Attachs/face/default.jpg'}" alt="">
+
+                    <span>{:msubstr($ticket['members'][$ticket['member_id']]['name'],0,10)}</span>
+
+                </li>
+
+                <!-- 处理人 -->
+                <li class="mr0">
+
+                    {:L('HANDLER')}：
+
+                    <img src="{$ticket['members'][$ticket['process_id']]['face']|default='/Attachs/face/default.jpg'}" alt="" id="disposeFace">
+
+                    <span id="disposeUser">{$ticket['members'][$ticket['process_id']]['name']|default=L('NOT_YET_ACCEPTED')}</span>
+
+                </li>
+
+                <!-- 发布时间 -->
+                <li>{:L('CREATE_TIME')}：<span>{$ticket.create_time|getDates}</span></li>
+
+                <!-- 分配时间 -->
+                <li>{:L('ASSIGN_TIME')}：{$ticket.assign_time|getDates}</li>
+
+                <!-- 处理时间 -->
+                <gt name="ticket.process_time" value="0"><li>{:L('PROCESS_TIME')}：<span>{$ticket.process_time|getDates}</span></li></gt>
+
+                <!-- 完成时间 -->
+                <gt name="ticket.end_time" value="0"><li>{:L('COMPLETION_TIME')}：<span>{$ticket.end_time|getDates}</span></li></gt>
+
+            </ul>
+
+        </div>
+
+        <div class="detail-main">
+
+            <div class="detail-content">
+
+                <!-- 子工单标题 -->
+                <div class="ticket-title" id="ticketTitle">
+
+                    {$ticket.title}
+
+                    <if condition="$ticket['status_id'] eq 10 && $ticket['editorAuth']">
+
+                        <!-- 操作工单 -->
+                        <div class="title-right">
+
+                            <a href="javascript:" class="ticket-operate"><span>{:L('MORE_OPERATE')}</span> <i class="layui-icon fts12">&#xe625;</i></a>
+
+                            <ul class="title-right-menu">
+
+                                <!-- 修改子工单 -->
+                                <li><a href="javascript:" onclick="editorSubTicket('{:encrypt($ticket[ticket_id],SUB_TICKET)}')" class="gray6">{:L('MODIFY_TICKET')}</a></li>
+
+                            </ul>
+
+                            <script type="text/javascript">
+
+                                var editorSubTicket = function (id)
+                                {
+                                    layer.open({
+                                        type: 2,
+                                        title:'{:L(\'MODIFY_SUB_TICKET\')}',
+                                        content: "{:U('SubTicket/editor')}?id="+id,
+                                        area:['90%','90%']
+                                    });
+                                };
+
+                                $(function()
+                                {
+                                    $('.ticket-operate').unbind('click').on('click',function(e)
+                                    {
+                                        e.stopPropagation();
+
+                                        $('.title-right-menu').slideToggle('fast');
+
+                                        $(document).bind('click',function(e)
+                                        {
+                                            $(".title-right-menu").slideUp('fast');
+                                        });
+                                    });
+
+                                })
+
+                            </script>
+
+                        </div>
+
+                    </if>
+
+                </div>
+
+                <!-- 子工单内容 -->
+                <div class="ticket-form">
+
+                    <div class="ticket-form-item ticket-textarea-content">
+
+                        <div class="ticket-form-name">{:L('TICKET_CONTENT')}</div>
+
+                        <div class="text-form-content ticket-textarea-form">
+
+                            {:getHtml($ticket['content'])}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <notempty name="ticket.attachments.createFiles">
+
+                    <!-- 子工单附件 -->
+                    <div class="ticket-form-item ticket-file">
+
+                        <div class="ticket-form-name ticket-attach"><i class="iconfont icon-fujian"></i><span>{:L('ATTACHMENT')}</span></div>
+
+                        <ul class="text-form-content">
+
+                            <volist name="ticket.attachments.createFiles" id="vo">
+
+                                <li>
+
+                                    {$vo.file_name|getFileName}.{$vo.file_type}<span class="black">（{$vo.file_size|getFileSize}）</span>
+
+                                    <a href="{$vo.file_link}" title="{$vo.file_name}" target="_blank"><i class="iconfont icon-xiazai"></i></a>
+
+                                </li>
+
+                            </volist>
+
+                        </ul>
+
+                    </div>
+
+                </notempty>
+
+                <notempty name="ticket.photo">
+
+                    <!-- 子工单图片 -->
+                    <div class="ticket-image" id="images">
+
+                        <ul>
+
+                            <volist name="ticket.photo" id="vo">
+
+                                <php>$m = ($i+1)%3;</php>
+
+                                <li class="<eq name='m' value='0'>center-item</eq>"><img src="{$vo}" data-original="{$img}" /></li>
+
+                            </volist>
+
+                        </ul>
+
+                    </div>
+
+                </notempty>
+
+            </div>
+
+            <div class="detail-reply detail-event relative">
+
+                <div class="reply-header" id="replyTab">
+
+                    <a href="javascript:" data-value="1" class="active">{:L('REPLY_LIST')}</a>
+
+                    <a href="javascript:" data-value="2">{:L('EVENT')}</a>
+
+                </div>
+
+                <!-- 工单回复列表 -->
+                <div class="reply-item response" id="item-1">
+
+                    <notempty name="ticket.reply">
+
+                        <volist name="ticket.reply" id="vo">
+
+                            <div class="item clearfix">
+
+                                <div class="content-header">
+
+                                    <img src="{$vo['face']|default='/Attachs/face/default.jpg'}" alt="" class="face"/>
+
+                                    <if condition="$vo['type'] eq 1">
+
+                                        <span class="mr5">{$vo['name']}</span>
+
+                                        <span>· {$vo.reply_time|getDates}</span>
+
+                                    <else />
+
+                                        <span class="blue5 mr5">{$vo['name']}</span>
+
+                                        <span class="blue5">· {$vo.reply_time|getDates}</span>
+
+                                    </if>
+
+                                </div>
+
+                                <div class="reply-content">
+
+                                    <div class="content replyImage">{$vo.reply_content|getHtml}</div>
+
+                                </div>
+
+                                <!-- 附件 -->
+                                <if condition="$ticket['attachments']['replyFiles'][$vo['reply_id']]">
+
+                                    <div class="reply-attach">
+
+                                        <volist name="ticket['attachments']['replyFiles'][$vo['reply_id']]" id="vo1">
+
+                                            <div class="attach-item">
+
+                                                {$vo1.file_name} <span class="black">（{$vo1.file_size|getFileSize}）</span><a href="{$vo1.file_link}" title="{$vo1.file_name}" target="_blank"><i class="iconfont icon-xiazai"></i></a>
+
+                                            </div>
+
+                                        </volist>
+
+                                    </div>
+
+                                </if>
+
+                            </div>
+
+                        </volist>
+
+                    <else />
+
+                        <div class="nodata">
+
+                            <i class="iconfont icon-nothing fts20"></i>
+
+                            <p>{:L('NO_DATA')}</p>
+
+                        </div>
+
+                    </notempty>
+
+                </div>
+
+                <!-- 工单事件列表 -->
+                <div class="event-item response pl15 hidden" id="item-2">
+
+                    <ul class="layui-timeline" id="ticketEvent"></ul>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <if condition="$ticket['status_id'] eq 10 && $ticket['replyAuth'] gt 0 && in_array($index['member_id'],[$ticket['member_id'],$ticket['process_id']])">
+
+        <!-- 回复 -->
+        <div class="reply-box response-box" id="reply-box-1">
+
+            <div class="reply-input">
+
+                <img src="{$index.face|default='/Attachs/face/default.jpg'}" alt="">
+
+                <input type="text" placeholder="{:L('REPLY_PLACE')}" id="reply-input"/>
+
+            </div>
+
+            <form action="" method="post" id="replyForm">
+
+                <input type="hidden" name="reply[ticket_id]" value="{$ticket.ticket_id}" id="ticket-input"/>
+
+                <div class="reply-textarea mt20 hidden" id="reply-textarea">
+
+                    <div class="textarea-hide iconfont icon-xiangxiajiantou"></div>
+
+                    <img src="{$index.face|default='/Attachs/face/default.jpg'}" alt="">
+
+                    <textarea id="ticketReply" name="reply[reply_content]"></textarea>
+
+                    <div class="reply-operate">
+
+                        <!-- 提交回复 -->
+                        <div class="submit-reply ui"><a href="javascript:" class="submit-btn">{:L('SUBMIT')}{:L('REPLY')}</a></div>
+
+                        <!-- 附件上传 -->
+                        <div class="upload-attach">
+
+                            <button type="button" class="layui-btn layui-btn-primary" id='uploadReplyFile' data-value="reply">
+
+                                <i class="layui-icon"></i>{:L('UPLOAD_ATTACHMENTS')}
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div class="attach-item" id="reply-attach-item"></div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </if>
+
+</div>
+
+
+<script type="text/javascript">
+
+    var ticketId = "{:encrypt($ticket['ticket_id'],'TICKET')}";
+
+</script>
+
+<script type="text/javascript">
+
+    $(function ()
+    {
+        var ticketTextContent = $(".ticket-textarea-content");
+
+        var textContentWidth = ticketTextContent.width();
+
+        ticketTextContent.find('img').each(function()
+        {
+            var image  = new Image();
+
+            image.src = $(this).attr('src');
+
+            if(image.width > textContentWidth)
+            {
+                $(this).css('width','80%');
+            }
+            else
+            {
+                $(this).css('width',image.width);
+            }
+        })
+    })
+
+</script>
+
+<script type="text/javascript" src="INDEX_PUBLIC_JS/sub-detail.js"></script>
+
+<script type="text/javascript" src="__PUBLIC__/js/viewer/viewer-jquery.min.js"></script>
+
+<script type="text/javascript">
+
+    layui.use('flow', function()
+    {
+        var flow = layui.flow;
+
+        flow.load(
+        {
+            elem: '#ticketEvent',
+            isAuto: false,
+            end: "{:L('NO_MORE')}",
+            done: function (page, next)
+            {
+                var lis = [];
+
+                var str = '';
+
+                var l = 0;
+
+                $.post("/subTicket/detail?id={:encrypt($ticket['ticket_id'],'SUB_TICKET')}&request=flow&p=" + page, function (res)
+                {
+                    var dayText = '';
+
+                    var dayClass = 'date';
+
+                    if (res.data == '')
+                    {
+                        next(lis.join(''), page < res.pages);
+                    }
+
+                    layui.each(res.data, function (key, val)
+                    {
+                        l = $("h3[data-time='" + key + "']");
+
+                        if (key == "{$nowTime}")
+                        {
+                            dayText = "{:L('TODAY')}";
+                        }
+                        else if (key == "{$yesTime}")
+                        {
+                            dayText = "{:L('YESTERDAY')}";
+                        }
+                        else
+                        {
+                            dayText = '&#xe63f;';
+
+                            dayClass = '';
+                        }
+
+                        str = "<li class='layui-timeline-item'>" +
+                                "<i class='layui-icon layui-timeline-axis " + dayClass + "'><span>" + dayText + "</span></i>" +
+                                "<div class='layui-timeline-content layui-text'>" +
+                                "<h3 class='layui-timeline-title' data-time=" + key + ">" + key + "</h3>";
+
+                        if (l.length > 0) str = '';
+
+                        layui.each(val, function (k1, v1)
+                        {
+                            str +=
+                                    "<p class='nowrap'><i class='quan'></i>"+
+                                    " <a href='javascript:' class='view-ticket'>" + v1.name + " </a>" + v1.eventTypeLang;
+
+                            str += "<span class='fr'>" + v1.create_at + "&nbsp;&nbsp;</span></p>";
+                        });
+
+                        if (l.length > 0)
+                        {
+                            l.parent('.layui-text').append(str);
+
+                            next('', page < res.pages);
+
+                            str = '';
+                        }
+
+                        lis.push(str);
+                    });
+
+                    if (l.length == 0)
+                    {
+                        next(lis.join(''), page < res.pages);
+                    }
+                });
+            }
+        });
+    });
+
+</script>
+
+<script type="text/javascript">
+
+    $(function()
+    {
+        $.each($('.reply-content .content img'),function(k,v)
+        {
+            var fileExt = (/[.]/.exec($(this).attr('src'))) ? /[^.]+$/.exec($(this).attr('src').toLowerCase()) : '';
+
+            if(fileExt != 'gif')
+            {
+                $(this).width('240');
+
+                $(this).height('135');
+            }
+
+            var _src = $(this).attr('src').replace("http://{$detailData.qiniuDomain}/",'');
+
+            _src = $(this).attr('src').replace("?imageMogr2/auto-orient/thumbnail/240x135!/format/png/blur/1x0/quality/100|imageslim",'');
+
+            $(this).removeAttr('alt').addClass('reply-image');
+
+            $(this).attr('data-original',_src);
+        });
+    });
+
+    $('body').find('#closeTicketDetail').click(function()
+    {
+        window.parent.postMessage('closeDetail','*');
+    });
+
+</script>

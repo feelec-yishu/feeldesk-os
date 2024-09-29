@@ -1,0 +1,2959 @@
+<include file="Public/header" />
+
+<link rel="stylesheet" type="text/css" href="INDEX_PUBLIC_CSS/ticket-detail.css?v=1"/>
+
+<link rel="stylesheet" href="__PUBLIC__/js/layui/extends/dtree/dtree.css">
+
+<link rel="stylesheet" href="__PUBLIC__/js/layui/extends/dtree/font/dtreefont.css">
+
+<style type="text/css">
+
+    .status-color{ color:{$detailData['ticket_status'][$ticket['status_id']]['status_color']|default='#333'}}
+
+    .layui-form-select dl dd.layui-this {background-color: rgba(254,115,0,0.05);color: #40485b;}
+
+</style>
+
+<div class="ticket-detail">
+
+    <eq name="ticket.look" value="1">
+
+        <div class="ticket-read"><i class="iconfont icon-ticket-unread"></i></div>
+
+    <else/>
+
+        <div class="ticket-read"><i class="iconfont icon-ticket-read"></i></div>
+
+    </eq>
+
+    <div class="ticket-detail-content <neq name='ticket.allow_reply' value='1'>hg98</neq>">
+
+        <div class="detail-sidebar sidebar" id="closeTicketDetail"><i class="iconfont icon-right"></i></div>
+
+        <!-- 标题栏 -->
+        <div class="detail-header clearfix">
+
+            <ul>
+
+                <notin name="ticket.audit_status" value="2,4,5,6">
+
+                    <!-- 工单状态 -->
+                    <gt name="detailData.isSuspend" value="0">
+
+                        <li class="orange1">{:L('TICKET_SUSPEND')}</li>
+
+                    <else />
+
+                        <li class="select select-status" id="selectStatus">
+
+                            {:L('TICKET_STATUS')}：
+
+                            <span class="status-color" id='currentStatus'>{$ticket_status[$ticket['status_id']]['lang_name']}</span>
+
+                            <if condition="(
+                                ( $ticket['allow_reply'] eq 1 && $ticket['dispose_id'] eq $index['member_id'] )
+                                ||
+                                ( $ticket['ticket_operate_auth'] && $ticket['status_id'] neq $ticket['end_status_id'] )
+                                ||
+                                $ticket['dispose_id'] eq 0
+                            )
+                            &&
+                            $ticket['delete'] eq 2">
+
+                                <i class="layui-icon fts12">&#xe625;</i>
+
+                                <div class="select-item status-item ptb0 hidden">
+
+                                    <form class="layui-form">
+
+                                        <div class="layui-input-block select-priority mar0">
+
+                                            <div class="layui-form-select">
+
+                                                <div class="layui-select-title center border_b">{:L('SELECT_TICKET_STATUS')}</div>
+
+                                                <dl class="layui-anim layui-anim-upbit update-status">
+
+                                                    <volist name="detailData.handlerTicketStatus" id="vo">
+
+                                                        <eq name="ticket.open_end_status" value="1">
+
+                                                            <dd data-value="{$vo.status_id}" class="pr10 relative">
+
+                                                                <span style="color:{$vo.status_color}">{$vo.lang_name}</span>
+
+                                                            </dd>
+
+                                                        <else />
+
+                                                            <neq name="ticket.end_status_id" value="$vo['status_id']">
+
+                                                                <dd data-value="{$vo.status_id}" class="pr10 relative">
+
+                                                                    <span style="color:{$vo.status_color}">{$vo.lang_name}</span>
+
+                                                                </dd>
+
+                                                            </neq>
+
+                                                        </eq>
+
+                                                    </volist>
+
+                                                </dl>
+
+                                            </div>
+
+                                        </div>
+
+                                    </form>
+
+                                </div>
+
+                            <elseif condition="$ticket['allow_reply'] eq 1 && $index['member_id'] eq $ticket['member_id'] && $ticket['delete'] eq 2" />
+
+                                <!-- 发布人更新状态 -->
+                                <i class="layui-icon fts12">&#xe625;</i>
+
+                                <div class="select-item status-item ptb0 hidden">
+
+                                    <form class="layui-form">
+
+                                        <div class="layui-input-block select-priority mar0">
+
+                                            <div class="layui-form-select">
+
+                                                <div class="layui-select-title center border_b">{:L('SELECT_TICKET_STATUS')}</div>
+
+                                                <dl class="layui-anim layui-anim-upbit update-status">
+
+                                                    <volist name="detailData.publisherTicketStatus" id="vo">
+
+                                                        <eq name="ticket.open_end_status" value="1">
+
+                                                            <dd data-value="{$vo.status_id}" class="pr10 relative">
+
+                                                                <span style="color:{$vo.status_color}">{$vo.lang_name}</span>
+
+                                                            </dd>
+
+                                                        <else />
+
+                                                            <neq name="ticket.end_status_id" value="$vo['status_id']">
+
+                                                                <dd data-value="{$vo.status_id}" class="pr10 relative">
+
+                                                                    <span style="color:{$vo.status_color}">{$vo.lang_name}</span>
+
+                                                                </dd>
+
+                                                            </neq>
+
+                                                        </eq>
+
+                                                    </volist>
+
+                                                </dl>
+
+                                                <!--
+                                                    <dl class="layui-anim layui-anim-upbit update-status" data-value="{:encrypt($ticket['ticket_id'],'TICKET')}">
+
+                                                        <dd data-value="{$ticket['end_status_id']}" class="pr10 relative">
+
+                                                            <span style="color:{$detailData['ticketStatus'][$ticket['end_status_id']]['status_color']}">
+
+                                                                {$detailData['ticketStatus'][$ticket['end_status_id']]['lang_name']}
+
+                                                            </span>
+
+                                                        </dd>
+
+                                                    </dl>
+                                                -->
+                                            </div>
+
+                                        </div>
+
+                                    </form>
+
+                                </div>
+
+                            </if>
+
+                        </li>
+
+                    </gt>
+
+                </notin>
+
+                <!-- 优先级 -->
+                <li class="select select-priority" id="selectPriority">
+
+                    {:L('PRIORITY')}：
+
+                    <span id="currentPriorityBg" class="priority <?php echo $ticketObj->getPriorityColor($ticket['priority']);?>"></span>
+
+                    <span id="currentPriority">{$ticketObj->getPriority($ticket['priority'])}</span>
+
+                    <if condition="$ticket['update_priority_auth'] eq 1">
+
+                        <i class="layui-icon fts12">&#xe625;</i>
+
+                        <div class="select-item priority-item ptb0 hidden">
+
+                            <form class="layui-form">
+
+                                <div class="layui-input-block select-priority mar0">
+
+                                    <div class="layui-form-select">
+
+                                        <div class="layui-select-title center border_b">{:L('SELECT_PRIORITY')}</div>
+
+                                        <dl class="layui-anim layui-anim-upbit update-priority" data-value="{:encrypt($ticket['ticket_id'],'TICKET')}">
+
+                                            <php>$prioritys = $ticketObj->getPriority();</php>
+
+                                            <volist name="prioritys" id="vo">
+
+                                                <dd data-value="{$key}" class="pr10 relative">
+
+                                                    <span class="priority {$ticketObj->getPriorityColor($key)}"></span>
+
+                                                    <span class="middle">{$vo}</span>
+
+                                                </dd>
+
+                                            </volist>
+
+                                        </dl>
+
+                                    </div>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+
+                    </if>
+
+                </li>
+
+                <!-- 发布人 -->
+                <li>
+
+                    {:L('PUBLISHER')}：
+
+                    <img src="{$ticket.publish.face|default='/Attachs/face/default.jpg'}" alt="">
+
+                    <span>{:msubstr($ticket['publish']['name'],0,10)}</span>
+
+                </li>
+
+                <!-- 接收人 -->
+                <li id="receive" data-value="{$ticket.recipient_id}">
+
+                    {:L('ACCEPTANCE')}：
+
+                    <img src="{$detailData['members'][$ticket['recipient_id']]['face']|default='/Attachs/face/default.jpg'}" alt="" id="receiveFace">
+
+                    <span id="receiveUser">{$detailData['members'][$ticket['recipient_id']]['name']|default=L('NOT_YET_ACCEPTED')}</span>
+
+                </li>
+
+                <!-- 处理人 -->
+                <if condition="$ticket['assign_ticket_auth'] eq 1">
+
+                    <!-- 当前用户具有分配工单权限或工单操作权限 -->
+                    <li class="mr0" onclick="assignProcessor()">
+
+                        {:L('HANDLER')}：
+
+                        <img src="{$detailData['members'][$ticket['dispose_id']]['face']|default='/Attachs/face/default.jpg'}" alt="" id="disposeFace">
+
+                        <span id="disposeName">{$detailData['members'][$ticket['dispose_id']]['name']|default=L('NOT_YET_ACCEPTED')}</span>
+
+                        <i class="layui-icon fts12">&#xe625;</i>
+
+                    </li>
+
+                <else />
+
+                    <li class="mr0">
+
+                        {:L('HANDLER')}：
+
+                        <img src="{$detailData['members'][$ticket['dispose_id']]['face']|default='/Attachs/face/default.jpg'}" alt="">
+
+                        <span>{$detailData['members'][$ticket['dispose_id']]['name']|default=L('NOT_YET_ACCEPTED')}</span>
+
+                    </li>
+
+
+                </if>
+
+            </ul>
+
+        </div>
+
+        <div class="detail-main">
+
+            <!-- 抄送人 -->
+            <notempty name="detailData.ticketCC">
+
+                <div class="ticket-cc">
+
+                    <ul>
+
+                        <li class="mr0">{:L('CC_PERSON')}：</li>
+
+                        <volist name="detailData.ticketCC" id="vo">
+
+                            <li>
+
+                                <gt name="i" value="1"><span class="cc-cut"></span></gt>
+
+                                <img src="{$vo.face|default='/Attachs/face/default.jpg'}" alt="">
+
+                                <span>{$vo.name}</span>
+
+                            </li>
+
+                        </volist>
+
+                    </ul>
+
+                </div>
+
+            </notempty>
+
+            <div class="detail-content">
+
+                <!-- 标题及操作 -->
+                <div class="ticket-title" id="ticketTitle">
+
+                    {$ticket.title}
+
+                    <!-- 操作工单 -->
+                    <div class="title-right">
+
+                        <gt name="detailData.isLibraryAuth" value="0">
+
+                            <a href="javascript:" class="library-base"><span>{:L('LIBRARY_QUERY')}</span></a>
+
+                        </gt>
+
+                        <if condition="(
+                            ( (!$detailData['associateTickets'][0]) && $ticket['dispose_id'] eq $index['member_id'])
+                            ||
+                            $ticket['editor_ticket_btn'] eq 1
+                            ||
+                            $ticket['show_urge_btn']
+                            ||
+                            $ticket['show_restart_btn']
+                            ||
+                            $detailData['isTransferAuth']
+							||
+							$detailData['isCloningAuth']
+                        )
+                        &&
+                        $ticket['delete'] eq 2">
+
+                        <a href="javascript:" class="ticket-operate"><span>{:L('MORE_OPERATE')}</span> <i class="layui-icon fts12">&#xe625;</i></a>
+
+                        <ul class="title-right-menu">
+
+                            <if condition="$ticket['editor_ticket_btn'] eq 1">
+
+                                <!-- 修改工单 -->
+                                <li><a href="{:U('ticket/edit',['id'=>encrypt($ticket['ticket_id'],'TICKET')])}" mini="editTicket" class="gray6">{:L('MODIFY_TICKET')}</a></li>
+
+                            </if>
+
+                            <!-- 修改记录 -->
+                            <li><a href="javascript:getTicketModifyRecord('{:encrypt($ticket[ticket_id],TICKET)}')" class="gray6">{:L('EDITOR_RECORD')}</a></li>
+
+                            <if condition="(!$detailData['associateTickets'][0]) && $detailData['isAssociateAuth'] gt 0 && $ticket['dispose_id'] eq $index['member_id']">
+
+                                <!-- 关联工单 -->
+                                <li onclick="associateTicket()">{:L('ASSOCIATE_TICKET')}</li>
+
+                            </if>
+
+                            <if condition="$ticket['show_urge_btn']">
+
+                                <!-- 催单 -->
+                                <li id="urgeTicket">{:L('URGE_TICKET')}</li>
+
+                            </if>
+
+                            <if condition="$ticket['show_restart_btn']">
+
+                                <!-- 重启工单 -->
+                                <li id="restartTicket">{:L('END_OPERATE')}</li>
+
+                            </if>
+
+                            <if condition="$ticket['suspend_ticket_btn']">
+
+                                <!-- 挂起工单 -->
+                                <li onclick="suspendTicket()">
+
+                                    <gt name="detailData.isSuspend" value="0">{:L('UN_SUSPEND')}<else />{:L('SUSPEND')}</gt>
+
+                                </li>
+
+                                <script type="text/javascript">
+
+                                    function suspendTicket()
+                                    {
+                                        var loading = layer.load(2,{offset:['15vw']});
+
+                                        $.post("{:U('Ticket/detail')}?id={:encrypt($ticket['ticket_id'],'TICKET')}",{source:'suspend'},function(result)
+                                        {
+                                            if(result.errcode === 0)
+                                            {
+                                                feelDeskAlert(result.msg,result);
+                                            }
+                                            else
+                                            {
+                                                feelDeskAlert(result.msg);
+                                            }
+
+                                            layer.close(loading);
+                                        })
+                                    }
+
+                                </script>
+
+                            </if>
+
+                            <if condition="$detailData['isCloningAuth']">
+
+                                <!-- 克隆工单 -->
+                                <li>
+
+                                    <a href="{:U('ticket/cloning',['id'=>encrypt($ticket['ticket_id'],'TICKET')])}" mini="editTicket" class="gray6">
+
+                                        {:L('PROJECT_CLONING_TICKET')}
+
+                                    </a>
+
+                                </li>
+
+                            </if>
+
+                            <!-- 服务报告 -->
+                            <li><a href="{:U('ticket/service_report',['id'=>encrypt($ticket['ticket_id'],'TICKET')])}" class="gray6" TARGET="_blank">{:L('SERVICE_REPORT')}</a></li>
+
+                        </ul>
+
+                            <script type="text/javascript">
+
+                                $(function()
+                                {
+                                    $('.ticket-operate').unbind('click').on('click',function(e)
+                                    {
+                                        e.stopPropagation();
+
+                                        $('.title-right-menu').slideToggle('fast');
+
+                                        $(document).bind('click',function()
+                                        {
+                                            $(".title-right-menu").slideUp('fast');
+                                        });
+                                    });
+                                })
+
+                            </script>
+
+                        </if>
+
+                    </div>
+
+                </div>
+
+                <!-- 详情Tab -->
+                <div class="detail-tab">
+
+                    <div class="layui-tab">
+
+                        <ul class="layui-tab-title">
+
+                            <li class="layui-this">{:L('TICKET_CONTENT')}</li>
+
+                            <li>{:L('TICKET_INFO')}</li>
+
+                            <li>{:L('SUB_TICKET')}</li>
+
+                            <li>{:L('ASSOCIATE_TICKET')}</li>
+
+                            <li>{:L('SATISFY')}</li>
+
+                        </ul>
+
+                        <div class="layui-tab-content">
+
+                            <!-- 工单内容 -->
+                            <div class="layui-tab-item layui-show">
+
+                                <!-- 表单 -->
+                                <div class="ticket-form">
+
+                                    <notempty name="ticket.mobile_discrete">
+
+                                        <div class="ticket-form-item">
+
+                                            <div class="ticket-option-form">{:L('MOBILE')} : <span class="ticket-option-content">{$ticket.mobile_discrete}</span>
+                                                <eq name="callcenterAuth" value="1">
+                                                    <i class="iconfont icon-boda blue6 icon-onclickcall" onclick="OnclickCall({$ticket['mobile_discrete']})"></i>
+                                                </eq>
+                                            </div>
+
+                                        </div>
+
+                                    </notempty>
+
+                                    <notempty name="ticket.mail_discrete">
+
+                                        <div class="ticket-form-item">
+
+                                            <div class="ticket-option-form">{:L('EMAIL')} : <span class="ticket-option-content">{$ticket.mail_discrete}</span></div>
+
+                                        </div>
+
+                                    </notempty>
+
+                                    <volist name="detailData.ticketForm" id="vo">
+
+                                        <div class="ticket-form-item">
+
+                                            <in name="vo.ticket_form_type" value="text,textarea">
+
+                                                <div class="ticket-form-name">{$vo.ticket_form_description}</div>
+
+                                                <div id='form-images' class="text-form-content <eq name='vo.ticket_form_type' value='textarea'>ticket-textarea-form ticket-textarea-content</eq>">
+                                                    {:getHtml($vo['ticket_form_content'])}
+                                                </div>
+
+                                                <else />
+
+                                                <div class="ticket-option-form">{$vo.ticket_form_description} : <span class="ticket-option-content">{:getHtml($vo['ticket_form_content'])}</span></div>
+
+                                            </in>
+
+                                        </div>
+
+                                    </volist>
+
+                                    <if condition="$ticket['content'] && $ticket['ticket_from'] eq 'Email'">
+
+                                        <div class="ticket-form-item ticket-textarea-content">
+
+                                            <div class="ticket-form-name">{:L('TICKET_CONTENT')}</div>
+
+                                            <div id='email-images' class="text-form-content ticket-textarea-form">
+
+                                                {:getHtml($ticket['content'])}
+
+                                            </div>
+
+                                        </div>
+
+                                    </if>
+
+                                </div>
+
+                                <!-- 附件 -->
+                                <notempty name="detailData.ticketAttach.createFiles">
+
+                                    <!--附件-->
+                                    <div class="ticket-form-item ticket-file mb10">
+
+                                        <div class="ticket-form-name ticket-attach"><i class="iconfont icon-fujian"></i><span>{:L('ATTACHMENT')}</span></div>
+
+                                        <ul class="text-form-content">
+
+                                            <volist name="detailData.ticketAttach.createFiles" id="vo">
+
+                                                <li>
+
+                                                    {$vo.file_name|getFileName}.{$vo.file_type}<span class="black">（{$vo.file_size|getFileSize}）</span>
+
+                                                    <a href="{$vo.file_link}" title="{$vo.file_name}" target="_blank"><i class="iconfont icon-xiazai"></i></a>
+
+                                                </li>
+
+                                            </volist>
+
+                                        </ul>
+
+                                    </div>
+
+                                </notempty>
+
+                                <!-- 图片 -->
+                                <notempty name="ticket.photo">
+
+                                    <!--图片-->
+                                    <div class="ticket-image" id="images">
+
+                                        <ul>
+
+                                            <volist name="ticket.photo" id="vo">
+
+                                                <php>$m = ($i+1)%3;</php>
+
+                                                <li class="<eq name='m' value='0'>center-item</eq>"><img src="{$vo}" data-original="{$img}"  alt=""/></li>
+
+                                            </volist>
+
+                                        </ul>
+
+                                    </div>
+
+                                </notempty>
+
+                            </div>
+
+                            <!-- 工单信息 -->
+                            <div class="layui-tab-item">
+
+                                <div class="ticket-info">
+
+                                    <ul class="clearfix">
+
+                                        <!-- 模板 -->
+                                        <li>{:L('TICKET_TEMPLATE')}：{$ticket.template_name|default=L('NOTHING')}</li>
+
+                                        <!-- 工单编号 -->
+                                        <li>{:L('TICKET_ID')}：{$ticket['ticket_no']}</li>
+
+                                        <!-- 所属部门 -->
+                                        <li>{:L('RES_DEPARTMENT')}：{$detailData['groupList'][$ticket['group_id']]['group_name']}</li>
+
+                                        <!-- 创建时间 -->
+                                        <li>{:L('CREATE_TIME')}：{$ticket.create_time|getDates}</li>
+
+                                        <!-- 分配时间 -->
+                                        <li>{:L('ASSIGN_TIME')}：{$ticket.assign_time|getDates}</li>
+
+                                        <!-- 处理时间 -->
+                                        <gt name="ticket.dispose_time" value="0"><li>{:L('PROCESS_TIME')}：{$ticket.dispose_time|getDates}</li></gt>
+
+                                        <notempty name="detailData.area.country">
+
+                                            <li>
+
+                                                {:L('AREA')}：{$detailData.area.country}
+
+                                                <notempty name="detailData.area.province"><span> - {$detailData.area.province}</span></notempty>
+
+                                                <notempty name="detailData.area.city"><span> - {$detailData.area.city}</span></notempty>
+
+                                                <notempty name="detailData.area.region"><span> - {$detailData.area.region}</span></notempty>
+
+                                            </li>
+
+                                        </notempty>
+
+                                        <!-- 完成时间 -->
+                                        <gt name="ticket.end_time" value="0"><li>{:L('COMPLETION_TIME')}：{$ticket.end_time|getDates}</li></gt>
+
+                                        <!-- 超时 -->
+                                        <gt name="ticket.deadtime" value="0">
+
+                                            <!-- 组件超时 -->
+                                            <li>{:L('DEADLINES_COMPONENTS')}：{$ticket.deadtime|getDates}</li>
+
+                                            <li>{:L('WHETHER_TIMEOUT')}：{:checkTicketIsTimeout($ticket['deadtime'],$ticket['end_time'])}</li>
+
+                                            <php>$timeOut = checkTicketIsTimeout($ticket['deadtime'],$ticket['end_time'],1);</php>
+
+                                            <if condition="$timeOut"><li>{:L('TIMEOUT')}：{$timeOut}</li></if>
+
+                                        <else />
+
+                                            <!-- 全局超时 -->
+                                            <li>{:L('WHETHER_TIMEOUT')}：{:checkIsTimeout($ticket['ticket_id'],$ticket['create_time'],$ticket['end_time'])}</li>
+
+                                            <php>$timeOut = checkIsTimeout($ticket['ticket_id'],$ticket['create_time'],$ticket['end_time'],1);</php>
+
+                                            <if condition="$timeOut">
+
+                                                <li>{:L('TIMEOUT')}：{$timeOut}</li>
+
+                                            </if>
+
+                                        </gt>
+
+                                        <!-- 耗时 -->
+                                        <li>
+
+                                            <neq name="ticket.status_id" value="$ticket['end_status_id']">
+
+                                                {:L('TIME_CONSUMING')}：
+
+                                                <if condition="$ticket['taking']['day'] || $ticket['taking']['hour']">
+
+                                                    <if condition="$ticket['taking']['day']">{$ticket.taking.day}{:L('DAYS')}</if>
+
+                                                    <if condition="$ticket['taking']['hour']">{$ticket.taking.hour}{:L('HOURS')}</if>
+
+                                                    <if condition="$ticket['taking']['min']">{$ticket.taking.min}{:L('MINUTES')}</if>
+
+                                                <else />
+
+                                                    {$ticket.taking.min}{:L('MINUTES')}
+
+                                                </if>
+
+                                            <else />
+
+                                                {:L('TOTAL_TIME')}：
+
+                                                <if condition="$ticket['ztaking']['day'] || $ticket['ztaking']['hour']">
+
+                                                    <if condition="$ticket['ztaking']['day']">{$ticket.ztaking.day}{:L('DAYS')}</if>
+
+                                                    <if condition="$ticket['ztaking']['hour']">{$ticket.ztaking.hour}{:L('HOURS')}</if>
+
+                                                <else />
+
+                                                    {$ticket.ztaking.min}{:L('MINUTES')}
+
+                                                </if>
+
+                                            </neq>
+
+                                        </li>
+
+                                        <!-- 工单来源 -->
+                                        <li class="ticket-from">
+
+                                            {:L('SOURCE')}：
+
+                                            {$ticketObj->getTicketFrom($ticket['ticket_from'])}
+
+                                        </li>
+
+                                    </ul>
+
+                                </div>
+
+                            </div>
+
+                            <!-- 子工单 -->
+                            <div class="layui-tab-item">
+
+                                <div class="sub-ticket response">
+
+                                    <notempty name="detailData.subTickets">
+
+                                        <volist name="detailData.subTickets" id="vo">
+
+                                            <div class='sub-ticket-item'>
+
+                                                <eq name="vo.status_id" value="10">
+
+                                                    <span class='sub-ticket-status bg-ff2e4b'>{:L('WAIT_PROCESS')}</span>
+
+                                                <else />
+
+                                                    <span class='sub-ticket-status bg-85D654'>{:L('COMPLETED')}</span>
+
+                                                </eq>
+
+                                                <if condition="$detailData['subTicketAuth']['detail']">
+
+                                                    <a href='javascript:' class="sub-ticket-title" onclick="subTicketDetail('{:encrypt($vo[ticket_id],SUB_TICKET)}')">{$vo.title}</a>
+
+                                                <else />
+
+                                                    <a href='javascript:' class="sub-ticket-title">{$vo.title}</a>
+
+                                                </if>
+
+                                                <if condition="$vo['status_id'] eq 10 && $detailData['subTicketAuth']['editor']">
+
+                                                    <a href='javascript:' class='iconfont icon-bianji editor-sub-ticket' onclick="editorSubTicket($(this),'{:encrypt($vo[ticket_id],SUB_TICKET)}')"></a>
+
+                                                </if>
+
+                                                <if condition="$detailData['subTicketAuth']['delete']">
+
+                                                    <a href='javascript:' class='iconfont icon-guanbi1 editor-sub-ticket' onclick="deleteSubTicket($(this),'{:encrypt($vo[ticket_id],SUB_TICKET)}')"></a>
+
+                                                </if>
+
+                                            </div>
+
+                                        </volist>
+
+                                        <if condition="$detailData['subTicketAuth']['create']">
+
+                                            <div class='add-ticket-item' onclick="addSubTicket($(this))"><i class='iconfont icon-add2'></i><span class='middle'>{:L('ADD_SUB_TICKET')}</span></div>
+
+                                        </if>
+
+                                    <else />
+
+                                        <if condition="$detailData['subTicketAuth']['create']">
+
+                                            <div class='add-ticket-item' onclick="addSubTicket($(this))"><i class='iconfont icon-add2'></i><span class='middle'>{:L('ADD_SUB_TICKET')}</span></div>
+
+                                        <else />
+
+                                            <div class="no-data">{:L('NO_DATA')}</div>
+
+                                        </if>
+
+                                    </notempty>
+
+                                    <script type="text/javascript">
+
+                                        var subTicketInput = "<div class='sub-ticket-form'>" +
+                                            "<input type='text' name='title' placeholder='{:L(SUB_TICKET_TITLE)}' autocomplete='off'>" +
+                                            "<a href='javascript:' onclick='submitSubTicket($(this))'>{:L('SURE')}</a>" +
+                                            " <a href='javascript:' onclick='cancelSubTicket($(this))'>{:L('CANCEL')}</a>" +
+                                            "</div>";
+
+                                        var addSubTicket = function(o)
+                                        {
+                                            o.before(subTicketInput);
+                                        };
+
+                                        var cancelSubTicket = function(o)
+                                        {
+                                            o.parent('.sub-ticket-form').remove();
+                                        };
+
+                                        var submitSubTicket = function(o)
+                                        {
+                                            var title = o.prev('input').val();
+
+                                            if(!title)
+                                            {
+                                                layer.msg("{:L('ENTER_SUB_TICKET_TITLE')}",{icon:2,time:2000,offset:'15vh'});
+                                            }
+                                            else
+                                            {
+                                                var id = "{:encrypt($ticket['ticket_id'],'TICKET')}";
+
+                                                var loading = layer.load(2,{offset:['150px']});
+
+                                                $.post("{:U('SubTicket/create')}",{id:id,title:title},function(data)
+                                                {
+                                                    layer.close(loading);
+
+                                                    if(data.status === 2)
+                                                    {
+                                                        var subTicket = "<div class='sub-ticket-item'>" +
+                                                            "<span class='sub-ticket-status bg-ff2e4b'>{:L('WAIT_PROCESS')}</span> " +
+                                                            "<a href='javascript:' class='sub-ticket-title' onclick=subTicketDetail('"+data.id+"')>"+title+"</a> " +
+                                                            "<a href='javascript:' class='iconfont icon-bianji editor-sub-ticket' onclick=editorSubTicket($(this),'"+data.id+"')></a> " +
+                                                            "<a href='javascript:' class='iconfont icon-guanbi1 editor-sub-ticket' onclick=deleteSubTicket($(this),'"+data.id+"')></a>"+
+                                                            "</div>";
+
+                                                        o.parent('.sub-ticket-form').before(subTicket).remove();
+                                                    }
+                                                    else
+                                                    {
+                                                        layer.msg(data.msg,{icon:2,time:2000,offset:'15vh'});
+                                                    }
+
+                                                },'JSON');
+                                            }
+                                        };
+
+                                        var editorSubTicket = function (o,id)
+                                        {
+                                            layer.open({
+                                                type: 2,
+                                                title:"{:L('MODIFY_SUB_TICKET')}",
+                                                content: "{:U('SubTicket/editor')}?id="+id,
+                                                area:['90%','90%']
+                                            });
+                                        };
+
+                                        var deleteSubTicket = function (o,id)
+                                        {
+                                            layer.confirm(language.SURE_DELETE_TICKET,{icon: 3, offset:['100px']},function(index)
+                                            {
+                                                layer.close(index);
+
+                                                var loading = layer.load(2,{offset:[offset]});
+
+                                                $.post("{:U('SubTicket/delete')}",{id:id},function(data)
+                                                {
+                                                    if(data.status === 2)
+                                                    {
+                                                        o.parent('.sub-ticket-item').remove();
+
+                                                        feelDeskAlert(data.msg);
+                                                    }
+                                                    else
+                                                    {
+                                                        feelDeskAlert(data.msg);
+                                                    }
+
+                                                    layer.close(loading);
+
+                                                },'JSON')
+                                            });
+                                        };
+
+                                        var subTicketDetail = function (id)
+                                        {
+                                            layer.open(
+                                            {
+                                                type: 2,
+                                                title: false,
+                                                offset: 'rt',
+                                                area: ['100%','100%'],
+                                                content:"{:U('SubTicket/detail')}?id="+id,
+                                                shade: 0,
+                                                skin: 'bounceInRight',
+                                                closeBtn:0,
+                                                scrollbar: true,
+                                                success: function(layero, index)
+                                                {
+                                                    var sidebar = layer.getChildFrame('body', index).find('.sidebar');
+
+                                                    sidebar.on('click',function()
+                                                    {
+                                                        layer.close(index);
+
+                                                        setTimeout(function()
+                                                        {
+
+                                                        },300);
+                                                    });
+
+                                                    if(index)
+                                                    {
+                                                        layer.close(index-1);
+                                                        layer.setTop(layero);
+                                                    }
+                                                }
+                                            });
+                                        }
+
+                                    </script>
+
+                                </div>
+
+                            </div>
+
+                            <!-- 关联工单 -->
+                            <div class="layui-tab-item">
+
+                                <notempty name="detailData.associateTickets">
+
+                                    <div class="associate">
+
+                                        <volist name="detailData.associateTickets" id="vo">
+
+                                            <div class="associate-item">
+
+                                                <a href="javascript:" mini="ticketDetail" data-id="{:encrypt($vo['ticket_id'],'TICKET')}" data-type="associate">{$vo.title}</a>
+
+                                                <if condition="$ticket['dispose_id'] eq $index['member_id']">
+
+                                                    <span class="cancel-associate" onclick="cancelAssociate('{$vo.ticket_id}','{$ticket.ticket_id}')">{:L('CANCEL_ASSOCIATE')}</span>
+
+                                                </if>
+
+                                            </div>
+
+                                        </volist>
+
+                                        <if condition="$ticket['dispose_id'] eq $index['member_id']">
+
+                                            <script type="text/javascript">
+
+                                                function cancelAssociate(cancel_id,id)
+                                                {
+                                                    var prompt = "{:L('PROMPT')}";
+
+                                                    layer.confirm("{:L('SURE_CANCEL_ASSOCIATE')}",{icon: 3, title:prompt,offset:['150px']},function()
+                                                    {
+                                                        $.post("{:U('reply')}",{cancel_associate_id:cancel_id,ticket_id:id},function(data)
+                                                        {
+                                                            var loading = layer.load(2,{offset:['15vw']});
+
+                                                            if(data.errcode === 0)
+                                                            {
+                                                                data.isReload = 1;
+
+                                                                feelDeskAlert(data.msg,data);
+                                                            }
+                                                            else
+                                                            {
+                                                                feelDeskAlert(data.msg);
+                                                            }
+
+                                                            layer.close(loading);
+                                                        })
+                                                    })
+                                                }
+
+                                            </script>
+
+                                        </if>
+
+                                    </div>
+
+                                <else />
+
+                                    <div class="no-data">{:L('NO_DATA')}</div>
+
+                                </notempty>
+
+                            </div>
+
+                            <!-- 满意度 -->
+                            <div class="layui-tab-item">
+
+                                <notempty name='detailData.ticketSatisfyData'>
+
+                                    <!-- 满意度 -->
+                                    <div class="ticket-satisfy">
+
+                                        <div class="ticket-satisfy-content">
+
+                                            <span>{$detailData.ticketSatisfyData.lang_name}</span>
+
+                                            <div id="ticket-satisfy-score"></div>
+
+                                        </div>
+
+                                        <notempty name="detailData.ticketSatisfyData.labels">
+
+                                            <ul class="ticket-satisfy-label">
+
+                                                <volist name="detailData.ticketSatisfyData.labels" id="vo">
+
+                                                    <li class="label-item">{$vo}</li>
+
+                                                </volist>
+
+                                            </ul>
+
+                                        </notempty>
+
+                                        <notempty name="detailData.ticketSatisfyData.advise">
+
+                                            <div class="ticket-advise">
+
+                                                {:L('ADVISE')}：{$detailData.ticketSatisfyData.advise}
+
+                                            </div>
+
+                                        </notempty>
+
+                                    </div>
+
+                                    <script type="text/javascript">
+
+                                        layui.use('rate',function()
+                                        {
+                                            var rate = layui.rate;
+
+                                            rate.render({
+                                                elem: '#ticket-satisfy-score',
+                                                value: "{$detailData.ticketSatisfyData.score}",
+                                                readonly: true
+                                            });
+                                        })
+
+                                    </script>
+
+                                <else />
+
+                                    <if condition="$ticket['satisfy_auth']">
+
+                                        <a href="javascript:satisfyFun()" class="satisfy-btn">{:L('CLICK_SATISFACTION')}</a>
+
+                                    <else />
+
+                                        <div class="no-data">{:L('NO_DATA')}</div>
+
+                                    </if>
+
+                                </notempty>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- 回复列表及事件 -->
+            <div class="detail-reply detail-event relative">
+
+                <div class="reply-header" id="replyTab">
+
+                    <a href="javascript:" data-value="1" class="<eq name='reply_tab' value='ticket_reply'>active</eq>">{:L('REPLY_LIST')}</a>
+
+                    <a href="javascript:" data-value="2" class="<eq name='reply_tab' value='inside_reply'>active</eq>">{:L('TEAM_COLLABORATION')}</a>
+
+                    <a href="javascript:" data-value="3">{:L('EVENT')}</a>
+
+                </div>
+
+                <!-- 工单回复列表 -->
+                <div class="reply-item response <neq name='reply_tab' value='ticket_reply'>hidden</neq>" id="item-1">
+
+                    <notempty name="detailData.replyList">
+
+                        <volist name="detailData.replyList" id="vo">
+
+                            <div class="item clearfix">
+
+                                <div class="content-header">
+
+                                    <img src="{$vo['face']|default='/Attachs/face/default.jpg'}" alt="" class="face"/>
+
+                                    <if condition="$vo['type'] eq 1">
+
+                                        <span class="mr5">{$vo['name']}</span>
+
+                                        <span>· {$vo.reply_time|getDates}</span>
+
+                                        <if condition="$detailData['isCommentAuth'] gt 0">
+
+                                            <a href="javascript:" data-value="{$vo['reply_id']}" data-type="reply" class="comment reply-comment">
+                                                <i class="iconfont icon-comment mr2"></i>{:L('COMMENT')}
+                                            </a>
+
+                                        </if>
+
+                                        <else />
+
+                                        <span class="blue5 mr5">{$vo['name']}</span>
+
+                                        <span class="blue5">· {$vo.reply_time|getDates}</span>
+
+                                        <if condition="$detailData['isCommentAuth'] gt 0">
+
+                                            <a href="javascript:" data-value="{$vo['reply_id']}" data-type="reply" class="comment reply-comment">{:L('COMMENT')}</a>
+
+                                        </if>
+
+                                    </if>
+
+                                </div>
+
+                                <div class="reply-content">
+
+                                    <div class="content replyImage">{$vo.reply_content|getHtml}</div>
+
+                                    <div class="comments">
+
+                                        <php>$j = 1</php>
+
+                                        <volist name="detailData.replyComment" id="vc">
+
+                                            <if condition="$vc['reply_id'] eq $vo['reply_id'] && $vc['comment_type'] eq 'reply'">
+
+                                                <div class="comment-item <gt name='j' value='3'>hidden</gt>">
+
+                                                    <img src="{$detailData['members'][$vc['member_id']]['face']|default='/Attachs/face/default.jpg'}" class="face" alt="">
+
+                                                    <span class="comment-name">{$detailData['members'][$vc['member_id']]['name']}</span>
+
+                                                    <span class="comment-content">：{$vc.content|getHtml}</span>
+
+                                                    <span class="comment-time">{$vc.create_time|formatTime}</span>
+
+                                                </div>
+
+                                                <php>$j++;</php>
+
+                                            </if>
+
+                                        </volist>
+
+                                        <gt name='j' value='4'><div class="comment-more"><i class="iconfont icon-xiangxiajiantou"></i></div></gt>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- 附件 -->
+                                <if condition="$detailData['ticketAttach']['replyFiles'][$vo['reply_id']]">
+
+                                    <div class="reply-attach">
+
+                                        <volist name="detailData['ticketAttach']['replyFiles'][$vo['reply_id']]" id="vo1">
+
+                                            <div class="attach-item">
+
+                                                {$vo1.file_name} <span class="black">（{$vo1.file_size|getFileSize}）</span><a href="{$vo1.file_link}" title="{$vo1.file_name}" target="_blank"><i class="iconfont icon-xiazai"></i></a>
+
+                                            </div>
+
+                                        </volist>
+
+                                    </div>
+
+                                </if>
+
+                            </div>
+
+                        </volist>
+
+                    <else />
+
+                        <div class="nodata">
+
+                            <i class="iconfont icon-nothing fts20"></i>
+
+                            <p>{:L('NO_DATA')}</p>
+
+                        </div>
+
+                    </notempty>
+
+                </div>
+
+                <!-- 团队沟通列表 -->
+                <div class="team-reply-item response pl15 <neq name='reply_tab' value='inside_reply'>hidden</neq>" id="item-2">
+
+                    <if condition="$ticket['dispose_id'] || $detailData.ticketCC">
+
+                        <div class="team-leaguer">
+
+                            <span>{:L('PARTICIPANTS')}：</span>
+
+                            <neq name="ticket.member_id" value="$ticket['dispose_id']">
+
+                                <notempty name="detailData['members'][$ticket['member_id']]">
+
+                                    <a href="javascript:" class="leaguer" data-name="{$detailData['members'][$ticket['member_id']]['name']}" data-value="{$ticket['member_id']}">
+
+                                        <img src="{$detailData['members'][$ticket['member_id']]['face']|default='/Attachs/face/default.jpg'}" alt="" title="{$detailData['members'][$ticket['member_id']]['name']}" />
+
+                                        <p>{$detailData['members'][$ticket['member_id']]['name']|default="--"}</p>
+
+                                    </a>
+
+                                </notempty>
+
+                            </neq>
+
+                            <notempty name="ticket.dispose_id">
+
+                                <a href="javascript:" class="leaguer" data-name="{$detailData['members'][$ticket['dispose_id']]['name']}" data-value="{$ticket['dispose_id']}">
+
+                                    <img src="{$detailData['members'][$ticket['dispose_id']]['face']|default='/Attachs/face/default.jpg'}" alt="" title="{$detailData['members'][$ticket['dispose_id']]['name']}" />
+
+                                    <p>{$detailData['members'][$ticket['dispose_id']]['name']|default="--"}</p>
+
+                                </a>
+
+                            </notempty>
+
+                            <volist name="detailData.ticketCC" id="vo">
+
+                                <a href="javascript:" class="leaguer" data-name="{$detailData['members'][$vo['member_id']]['name']}" data-value="{$vo['member_id']}">
+
+                                    <img src="{$detailData['members'][$vo['member_id']]['face']|default='/Attachs/face/default.jpg'}" alt="" title="{$detailData['members'][$vo['member_id']]['name']}" />
+
+                                    <p>{$detailData['members'][$vo['member_id']]['name']|default="--"}</p>
+
+                                </a>
+
+                            </volist>
+
+                        </div>
+
+                    </if>
+
+                    <notempty name="detailData.insideData.teamReplyList">
+
+                        <volist name="detailData.insideData.teamReplyList" id="vo">
+
+                            <div class="item clearfix">
+
+                                <div class="content-header">
+
+                                    <img src="{$vo['face']|default='/Attachs/face/default.jpg'}" alt="" class="face"/>
+
+                                    <span class="mr5">{$vo['name']}</span>
+
+                                    <span>· {$vo.reply_time|getDates}</span>
+
+                                    <if condition="$detailData['isCommentAuth'] gt 0">
+
+                                        <a href="javascript:" data-value="{$vo['reply_id']}" data-type="inside" class="comment reply-comment">
+                                            <i class="iconfont icon-comment mr2"></i>{:L('COMMENT')}
+                                        </a>
+
+                                    </if>
+
+                                </div>
+
+                                <div class="reply-content">
+
+                                    <div class="content replyImage">{$vo.reply_content|getHtml}</div>
+
+                                    <div class="comments">
+
+                                        <php>$j = 1</php>
+
+                                        <volist name="detailData.replyComment" id="vc">
+
+                                            <if condition="$vc['reply_id'] eq $vo['reply_id'] && $vc['comment_type'] eq 'inside'">
+
+                                                <div class="comment-item <gt name='j' value='3'>hidden</gt>">
+
+                                                    <img src="{$detailData['members'][$vc['member_id']]['face']|default='/Attachs/face/default.jpg'}" class="face" alt="">
+
+                                                    <span class="comment-name">{$detailData['members'][$vc['member_id']]['name']}</span>
+
+                                                    <span class="comment-content">：{$vc.content|getHtml}</span>
+
+                                                    <span class="comment-time">{$vc.create_time|formatTime}</span>
+
+                                                </div>
+
+                                                <php>$j++;</php>
+
+                                            </if>
+
+                                        </volist>
+
+                                        <gt name='j' value='4'><div class="comment-more"><i class="iconfont icon-xiangxiajiantou"></i></div></gt>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- 附件 -->
+                                <if condition="$detailData['ticketAttach']['teamReplyFiles'][$vo['reply_id']]">
+
+                                    <div class="reply-attach">
+
+                                        <volist name="detailData['ticketAttach']['teamReplyFiles'][$vo['reply_id']]" id="vo1">
+
+                                            <div class="attach-item">
+
+                                                {$vo1.file_name} <span class="black">（{$vo1.file_size|getFileSize}）</span><a href="{$vo1.file_link}" title="{$vo1.file_name}"><i class="iconfont icon-xiazai fts20"></i></a>
+
+                                            </div>
+
+                                        </volist>
+
+                                    </div>
+
+                                </if>
+
+                            </div>
+
+                        </volist>
+
+                        <else />
+
+                        <div class="nodata">
+
+                            <i class="iconfont icon-nothing fts20"></i>
+
+                            <p>{:L('NO_DATA')}</p>
+
+                        </div>
+
+                    </notempty>
+
+                </div>
+
+                <!-- 工单事件列表 -->
+                <div class="event-item response pl15 hidden" id="item-3">
+
+                    <ul class="layui-timeline" id="ticketEvent"></ul>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <if condition="$ticket['allow_reply']">
+
+        <!-- 回复 -->
+        <div class="reply-box response-box <neq name='reply_tab' value='ticket_reply'>hidden</neq>" id="reply-box-1">
+
+            <div class="reply-input">
+
+                <img src="{$index.face|default='/Attachs/face/default.jpg'}" alt="">
+
+                <input type="text" placeholder="{:L('REPLY_PLACE')}" id="reply-input"/>
+
+            </div>
+
+            <form action="" method="post" id="replyForm">
+
+                <input type="hidden" name="reply[ticket_id]" value="{$ticket.ticket_id}" id="ticket-input"/>
+
+                <div class="reply-textarea hidden" id="reply-textarea">
+
+                    <div class="textarea-hide iconfont icon-xiangxiajiantou"></div>
+
+                    <img src="{$index.face|default='/Attachs/face/default.jpg'}" alt="">
+
+                    <textarea id="ticketReply" name="reply[reply_content]"></textarea>
+
+                    <div class="reply-operate">
+
+                        <!-- 提交回复 -->
+                        <div class="submit-reply ui"><a href="javascript:" class="submit-btn">{:L('SUBMIT')}{:L('REPLY')}</a></div>
+
+                        <notempty name="detailData.isFastReplyAuth">
+
+                            <!-- 快捷回复 -->
+                            <div class="quick-reply ui"><a href="javascript:" class="">{:L('QUICK_REPLY')}</a></div>
+
+                        </notempty>
+
+                        <!-- 附件上传 -->
+                        <div class="upload-attach">
+
+                            <button type="button" class="layui-btn layui-btn-primary" id='uploadReplyFile' data-value="reply">
+
+                                <i class="layui-icon"></i>{:L('UPLOAD_ATTACHMENTS')}
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div class="attach-item" id="reply-attach-item"></div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+        <notempty name="detailData.insideData.isTeamAuth">
+
+            <!-- 团队沟通 -->
+            <div class="team-reply-box response-box <neq name='reply_tab' value='inside_reply'>hidden</neq>" id="reply-box-2">
+
+                <div class="team-reply-input">
+
+                    <img src="{$index.face|default='/Attachs/face/default.jpg'}" alt="">
+
+                    <input type="text" placeholder="{:L('REPLY_PLACE')}" id="team-reply-input"/>
+
+                </div>
+
+                <form action="" method="post" id="teamReplyForm">
+
+                    <input type="hidden" name="team_reply[ticket_id]" value="{$ticket.ticket_id}"/>
+
+                    <div class="team-reply-textarea mt20 hidden" id="team-reply-textarea">
+
+                        <div class="team-textarea-note">
+
+                            <span class="red middle">*</span>
+
+                            <span class="middle">{:L('TEAM_CC_NOTE')}</span>
+
+                        </div>
+
+                        <div class="team-textarea-hide iconfont icon-xiangxiajiantou"></div>
+
+                        <img src="{$index.face|default='/Attachs/face/default.jpg'}" alt="">
+
+                        <textarea id="teamReply" name="team_reply[reply_content]">
+
+                            <notempty name="cc">
+
+                                <volist name="cc" id="vo">
+
+                                    <span class="atwho-inserted" data-atwho-at-query="@">
+
+                                        <span class="cc-member">@<span style="vertical-align: middle">{$vo.name}</span></span>
+
+                                        <input type="hidden" name="ticket[cc_id][]" value="{$vo.member_id}">
+
+                                    </span>&zwj;&nbsp;
+
+                                </volist>
+
+                            </notempty>
+
+                        </textarea>
+
+                        <div class="reply-operate">
+
+                            <!-- 提交回复 -->
+                            <div class="team-submit-reply ui"><a href="javascript:" class="team-submit-btn fts13">{:L('SUBMIT')}{:L('REPLY')}</a></div>
+
+                            <!-- 附件上传 -->
+                            <div class="upload-attach">
+
+                                <button type="button" class="layui-btn layui-btn-primary" id='uploadInsideReplyFile' data-value="team">
+
+                                    <i class="layui-icon"></i>{:L('UPLOAD_ATTACHMENTS')}
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                        <div class="cc-member-item hidden"></div>
+
+                        <div class="cc-item hidden" id="cc-item">
+
+                            <notempty name="detailData.ticketCC">
+
+                                <volist name="detailData.ticketCC" id="vo">
+
+                                    <span class="atwho-inserted" data-atwho-at-query="@">
+
+                                        <span class="cc-member">@<span style="vertical-align: middle">{$vo.name}</span></span>
+
+                                        <input type="hidden" name="ticket[cc_id][]" value="{$vo.member_id}">
+
+                                    </span>
+
+                                </volist>
+
+                            </notempty>
+
+                        </div>
+
+                        <div class="attach-item" id="team-attach-item"></div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </notempty>
+
+    </if>
+
+</div>
+
+<if condition="in_array($ticket['audit_status'],[2,5]) && $detailData['auditTicketAuth']">
+
+    <div class="ticket-audit hidden">
+
+        <div class="audit-content">
+
+            <form id="audit-form">
+
+                <input type="hidden" name="audit_progress_id" value="{$detailData['auditTicketAuth']}" />
+
+                <textarea placeholder="{:L('ENTER_APPROVAL_COMMENTS')}"></textarea>
+
+            </form>
+
+        </div>
+
+        <div class="clearfix"><div id="submit-audit" class="fl audit-btn bg0">{:L('SUBMIT')}</div></div>
+
+    </div>
+
+</if>
+
+<if condition="$ticket['assign_ticket_auth']">
+
+    <!-- 分配处理人 -->
+    <div class="process-panel hidden" id="processPanel">
+
+        <div class="process-item layui-form">
+
+            <form id="processForm" class="hg100">
+
+                <input type='hidden' name="source" value="assignProcessor"/>
+
+                <input type='hidden' name="groupId" value="{$ticket.group_id}"/>
+
+                <input type='hidden' name="userId" value="{$ticket.dispose_id}"/>
+
+                <div class="process-content">
+
+                    <div class="process-groups">
+
+                        <div class="process-group-search">
+
+                            <input type="text" name="keyword" value="" placeholder="{:L('DEPARTMENT_NAME')}" autocomplete="off" id="processGroupSearch"/>
+
+                        </div>
+
+                        <ul class="process-group-item" id="processGroupItem">
+
+                            <if condition="$ticket['ticket_operate_auth']">
+
+                                {$detailData.groupTreeHtml}
+
+                            <else />
+
+                                <!-- 部门管理员和处理人 - 本部门分配处理人 -->
+                                <volist name="detailData.groupList" id="vo">
+
+                                    <in name="vo.group_id" value="$index['group_id']">
+
+                                        <li data-value='{$vo.group_id}' class="<eq name='vo.group_id' value='$ticket[group_id]'>group-selected</eq>">
+                                            {$vo.group_name}
+                                        </li>
+
+                                    </in>
+
+                                </volist>
+
+                            </if>
+
+                        </ul>
+
+                    </div>
+
+                    <div class="process-users">
+
+                        <div class="process-user-search">
+
+                            <input type="text" name="keyword" value="" placeholder="{:L('NAME')}" autocomplete="off" id="processUserSearch"/>
+
+                        </div>
+
+                        <ul class="process-user-item" id="processUserItem">
+
+                            <li data-value="auto" data-group="0">{:L('AUTO_ASSIGN')}</li>
+
+                            <volist name="detailData.members" id="vo">
+
+                                <li data-value="{$vo.member_id}" data-group="{$vo.group_id}" class="<if condition='$vo[member_id] eq $ticket[dispose_id]'>user-selected </if><notin name='ticket.group_id' value='$vo[group_id]'>hidden</notin>">{$vo.name}</li>
+
+                            </volist>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+        <footer><a href="javascript:" class="process-submit" id="sureSelectProcess">{:L('CONFIRM_SELECT')}</a></footer>
+
+        <script type="text/javascript">
+
+            function assignProcessor()
+            {
+                layui.use(['form'], function ()
+                {
+                    layer.open(
+                    {
+                        title: "{:L('ASSIGN_PROCESSOR')}",
+                        type: 1,
+                        content: $('#processPanel'),
+                        skin: 'process-window',
+                        offset: ['10%'],
+                        area: ['70%', '500px'],
+                        success: function ()
+                        {
+                            var processUserItem = $('#processUserItem');
+
+                            $('#processGroupItem').find('li').unbind('click').on('click',function()
+                            {
+                                var value = $(this).data('id');
+
+                                $("input[name='groupId']").val(value);
+
+                                $(this).addClass('group-selected').siblings('li').removeClass('group-selected');
+
+                                processUserItem.find('li').each(function()
+                                {
+                                    var groupIds = $(this).data('group');
+
+                                    var groupIdArr = groupIds.toString().split(',');
+
+                                    if($.inArray(value.toString(),groupIdArr) >= 0)
+                                    {
+                                        $(this).show();
+                                    }
+                                    else
+                                    {
+                                        if($(this).data('value') !== 'auto')
+                                        {
+                                            $(this).hide();
+                                        }
+                                    }
+                                });
+                            });
+
+                            processUserItem.find('li').unbind('click').on('click',function()
+                            {
+                                var userId = $(this).data('value');
+
+                                $(this).addClass('user-selected').siblings('li').removeClass('user-selected');
+
+                                $("input[name='userId']").val(userId);
+                            });
+
+                            $('#processGroupSearch').keyup(function ()
+                            {
+                                var value = $(this).val();
+
+                                if(value)
+                                {
+                                    $('#processGroupItem').find('li').hide().filter(":contains('" + ($(this).val()) + "')").show();
+                                }
+                                else
+                                {
+                                    $('#processGroupItem').find('li').show();
+                                }
+                            });
+
+                            $('#processUserSearch').keyup(function ()
+                            {
+                                var value = $(this).val();
+
+                                if(value)
+                                {
+                                    $('#processUserItem').find('li').addClass('user-hidden').filter(":contains('" + ($(this).val()) + "')").removeClass('user-hidden');
+                                }
+                                else
+                                {
+                                    $('#processUserItem').find('li').removeClass('user-hidden');
+                                }
+                            });
+
+                            $('#sureSelectProcess').unbind('click').on('click',function()
+                            {
+                                var loading = layer.load(2,{offset:['150px']});
+
+                                $.post("{:U('Ticket/detail')}?id={:encrypt($ticket['ticket_id'],'TICKET')}",$('#processForm').serialize(),function(data)
+                                {
+                                    if(data.errcode === 0)
+                                    {
+                                        layer.msg(data.msg,{closeBtn:0,time:1000,offset:'15vh'},function()
+                                        {
+                                            //当父级页面为我处理的工单时，分配成功后移除工单并关闭详情页
+                                            if(parent.action === 'disposeTicket')
+                                            {
+                                                parent.$("tr[data-value='"+data.ticket_no+"'],div.ticket-list[data-value='"+data.ticket_no+"']").remove();
+
+                                                //当前iframe层的索引
+                                                var index = parent.layer.getFrameIndex(window.name);
+
+                                                parent.layer.close(index)
+                                            }
+                                            else
+                                            {
+                                                window.location.reload();
+                                            }
+                                        });
+                                    }
+                                    else
+                                    {
+                                        layer.close(loading);
+
+                                        layer.msg(data.msg,{icon:2,time:2000,offset:'15vh'});
+                                    }
+                                },'JSON');
+                            });
+                        }
+                    });
+                })
+            }
+
+        </script>
+
+    </div>
+
+</if>
+
+<if condition="(!$detailData['associateTickets'][0]) && $detailData['isAssociateAuth'] gt 0 && $ticket['delete'] eq 2">
+
+    <!-- 关联工单 -->
+    <div class="associate-panel hidden" id="associatePanel">
+
+        <header>
+
+            <span class="fts14">{:L('ASSOCIATE_TICKET')}</span>
+
+            <div class="associate-search">
+
+                <input type="text" value="{$associate_keyword}" placeholder="{:L('ASSOCIATE_SEARCH')}" id="associateSearch">
+
+                <a href="javascript:" onclick="searchAssociate($(this))">{:L('SEARCH')}</a>
+
+            </div>
+
+            <i class="iconfont icon-close1 associate-closed" title="{:L('CLOSE')}"></i>
+
+        </header>
+
+        <div class="associate-item layui-form">
+
+            <div class="item-header">
+
+                <ul><li>{:L('CHOOSE')}</li><li>{:L('TICKET_TITLE')}</li><li>{:L('TICKET_ID')}</li></ul>
+
+            </div>
+
+            <form id="associateForm">
+
+                <input type='hidden' name="associate[ticket_id]" value="{$ticket.ticket_id}"/>
+
+                <div id="associateItem"><div class="associate-content">{:L('TICKET_TITLE_NO')}</div></div>
+
+            </form>
+
+        </div>
+
+        <footer><a href="javascript:" class="associate-submit" id="sureSelectAssociate">{:L('CONFIRM_SELECT')}</a></footer>
+
+    </div>
+
+    <script type="text/javascript">
+
+        var form;
+
+        function associateTicket()
+        {
+            layui.use(['form'], function ()
+            {
+                form = layui.form;
+
+                layer.open(
+                {
+                    title: false,
+                    type: 1,
+                    content: $('#associatePanel'),
+                    closeBtn: 0,
+                    skin: 'associate-window',
+                    offset: ['10%'],
+                    area: ['70%', '400px'],
+                    success: function (layero, index)
+                    {
+                        $('.associate-closed').on('click', function ()
+                        {
+                            layer.close(index)
+                        });
+                    }
+                });
+
+                $('#associateSearch').keyup(function ()
+                {
+                    var value = $(this).val();
+
+                    if(value)
+                    {
+                        $('#associateItem').find('.associate-ticket-item').hide().filter(":contains('" + ($(this).val()) + "')").show();
+                    }
+                    else
+                    {
+                        $('#associateItem').find('.associate-ticket-item').show();
+                    }
+                });
+
+                $(document).unbind('click').on('click','.associate-ticket-item',function(e)
+                {
+                    e.stopPropagation();
+
+                    $('.associate-ticket-item').find('input[type="radio"]').prop('checked', false).data('checked', false);
+
+                    var radio = $(this).find("input[type='radio']");
+
+                    if(radio.data('checked') === false)
+                    {
+                        radio.prop('checked',true).data('checked',true);
+                    }
+                    else
+                    {
+                        radio.prop('checked',false).data('checked',false);
+                    }
+
+                    form.render('radio');
+                });
+
+                $('#sureSelectAssociate').unbind('click').on('click',function()
+                {
+                    var loading = layer.load(2,{offset:['150px']});
+
+                    $.post("{:U('reply')}",$('#associateForm').serialize(),function(data)
+                    {
+                        if(data.errcode === 0)
+                        {
+                            layer.msg(data.msg,{icon:1,time:1000,offset:'15vh'},function()
+                            {
+                                window.location.reload();
+                            });
+                        }
+                        else
+                        {
+                            layer.close(loading);
+
+                            layer.msg(data.msg,{icon:2,time:2000,offset:'15vh'});
+                        }
+                    },'JSON');
+                });
+
+                $(document).bind('click',function()
+                {
+                    $(".title-right-menu").slideUp('fast');
+                });
+
+            })
+        }
+
+        var searchAssociate = function (o)
+        {
+            $('#associateItem').html("<div class='associate-content'><div class='layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop'></div></div>");
+
+            var keyword = o.prev('input').val();
+
+            $.post("{:U('Ticket/detail')}?id={:encrypt($ticket['ticket_id'],'TICKET')}&request=associate",{keyword:keyword},function(result)
+            {
+                var item = '';
+
+                $.each(result.data,function(k,v)
+                {
+                    var title       = v.title.replace(keyword,"<span class='green3'>"+keyword+"</span>");
+
+                    var ticket_no   = v.ticket_no.replace(keyword,"<span class='green3'>"+keyword+"</span>");
+
+                    item += "<div class='associate-ticket-item'><ul>" +
+                        "<li><input type='radio' name='associate[associate_id]' data-checked='false' value='"+v.ticket_id+"'/></li>" +
+                        "<li>"+ title +"</li><li>"+ ticket_no +"</li></ul></div>";
+
+                });
+
+                if(item)
+                {
+                    $('#associateItem').html(item);
+
+                    form.render('radio');
+                }
+                else
+                {
+                    $('#associateItem').html("<div class='associate-content'>{:L('NO_DATA')}</div>");
+                }
+
+            },'JSON');
+        }
+
+    </script>
+
+</if>
+
+<if condition="$ticket['show_restart_btn']">
+
+    <!-- 重启工单 -->
+    <div class="restart-shade"></div>
+
+    <div class="restart-panel hidden" id="restartPanel">
+
+        <header><span>{:L('SELECT_RESTART_STATUS')}</span><a href='javascript:' class="restart-close iconfont icon-close1"></a></header>
+
+        <form class="layui-form" id="restartForm">
+
+            <input type="hidden" name="restart[ticket_id]" value="{$ticket['ticket_id']}" />
+
+            <input type="hidden" name="restart[dispose_id]" value="{$ticket['dispose_id']}" />
+
+            <div class="layui-form-item">
+
+                <div class="layui-input-block">
+
+                    <select name="restart[status_id]">
+
+                        <volist name="detailData.ticket_status" id="vo">
+
+                            <neq name="ticket.end_status_id" value="$vo['status_id']">
+
+                                <option value="{$vo.status_id}">{$vo.lang_name}</option>
+
+                            </neq>
+
+                        </volist>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="layui-form-item submit-restart">
+
+                <a href='javascript:' class="layui-btn">{:L('SUBMIT')}</a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    <script type="text/javascript">
+
+        $(function()
+        {
+            $('#restartTicket,.restart-close').on('click',function()
+            {
+                $(".restart-shade,#restartPanel").fadeToggle('fast');
+
+                $('.submit-restart').on('click',function()
+                {
+                    var loading = layer.load(2,{offset:['15vw']});
+
+                    $.post("{:U('reply')}",$('#restartForm').serialize(),function(data)
+                    {
+                        if(data.errcode === 0)
+                        {
+                            data.isReload = 1;
+
+                            feelDeskAlert(data.msg,data);
+                        }
+                        else
+                        {
+                            feelDeskAlert(data.msg);
+                        }
+
+                        layer.close(loading);
+
+                    },'JSON')
+                })
+            });
+        })
+
+    </script>
+
+</if>
+
+<if condition="$ticket['show_urge_btn']">
+
+    <!-- 催单 -->
+    <div class="urge-panel hidden" id="urgePanel">
+
+        <div class="urge-main">
+
+            <form action="" class="layui-form" id="urgeForm">
+
+                <input type="hidden" name="urge[ticket_id]" value="{$ticket['ticket_id']}">
+
+                <input type="hidden" name="urge[title]" value="{$ticket['title']}">
+
+                <input type="hidden" name="urge[ticket_no]" value="{$ticket['ticket_no']}">
+
+                <div class="urge-item">
+
+                    <div class="urge-title">{:L('PUBLISHER')}</div>
+
+                    <div class="urge-list">
+
+                        <ul class="fts0 plr15">
+
+                            <li>
+
+                                <input type="checkbox" name="urge[members][]" value="{$ticket['member_id']}" lay-skin="primary" title="{$detailData['members'][$ticket['member_id']]['name']}">
+
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+                <gt name="ticket.dispose_id" value="0">
+
+                    <div class="urge-item">
+
+                        <div class="urge-title">{:L('HANDLER')}</div>
+
+                        <div class="urge-list">
+
+                            <ul class="fts0 plr15">
+
+                                <li>
+
+                                    <input type="checkbox" name="urge[members][]" value="{$ticket['dispose_id']}" lay-skin="primary" title="{$detailData['members'][$ticket['dispose_id']]['name']}">
+
+                                </li>
+
+                            </ul>
+
+                        </div>
+
+                    </div>
+
+                </gt>
+
+                <notempty name="detailData.ticketCC">
+
+                    <div class="urge-item">
+
+                        <div class="urge-title">{:L('COLLABORATOR')}</div>
+
+                        <div class="urge-list">
+
+                            <ul class="fts0 plr15">
+
+                                <volist name="detailData.ticketCC" id="vo">
+
+                                    <li>
+
+                                        <input type="checkbox" name="urge[members][]" value="{$vo.member_id}" lay-skin="primary" title="{$vo.name}">
+
+                                    </li>
+
+                                </volist>
+
+                            </ul>
+
+                        </div>
+
+                    </div>
+
+                </notempty>
+
+                <div class="urge-item">
+
+                    <div class="urge-title">{:L('ENTER_URGE_CONTENT')} <a href='javascript:' onclick='show_urge_tag()'  class="urge-tag fr hidden">{:L('TAG_VARIABLE')}</a></div>
+
+                    <div class="urge-textarea">
+
+                        <textarea name="urge[content]" id="urgeTicketEditor">
+
+                            {:L('URGE_EXAMPLE')}，{:L('TICKET_TITLE')}：{{ticket_title}}，{:L('TICKET_ID')}：{{ticket_no}}，{:L('PROMOTER')}：{$index['name']}
+
+                        </textarea>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+        <div class="submit-urge"><a href="javascript:" class="layui-btn" id="urgeSubmit">{:L('CONFIRM_SEND')}</a></div>
+
+    </div>
+
+    <script type="text/javascript">
+
+        $(function()
+        {
+            layui.use(['layedit'], function()
+            {
+                var layedit = layui.layedit;
+
+                $('#urgeTicket').unbind('click').on('click',function()
+                {
+                    layer.open(
+                    {
+                        title: "{:L('SELECT_URGE_PERSON')}",
+                        type: 1,
+                        content: $('#urgePanel'),
+                        closeBtn: 1,
+                        skin: 'urge-window',
+                        offset: ['10%'],
+                        moveOut:true,
+                        moveType: 0,
+                        area: ['70%', '62%'],
+                        success: function ()
+                        {
+                            var urgeTicketEditor = layedit.build('urgeTicketEditor',{hideTool:['italic','del','image','link','unlink'], height:120});
+
+                            $('#urgeSubmit').unbind('click').on('click',function(e)
+                            {
+                                e.stopPropagation();
+
+                                layedit.sync(urgeTicketEditor);
+
+                                var loading = layer.load(2,{offset:['15vh']});
+
+                                $.post("{:U('Ticket/urgeTicket')}",$('#urgeForm').serialize(),function(data)
+                                {
+                                    if(data.errcode === 0)
+                                    {
+                                        layer.msg(data.msg,{icon:1,time:1000,offset:'15vh'},function()
+                                        {
+                                            window.location.reload();
+                                        });
+                                    }
+                                    else
+                                    {
+                                        feelDeskAlert(data.msg,data);
+
+                                        layer.close(loading);
+                                    }
+                                },'JSON');
+                            })
+                        }
+                    });
+                });
+            });
+        });
+
+        function show_urge_tag()
+        {
+            var urgeLabelBox = "<div class='urge-label'>"+
+                    "<div class='label-header'>"+language.TRIGGER_NOTE+"<span class='iconfont icon-close2 close'></span></div>" +
+                    "<div class='label-item'>" +
+                    "<div>{:L('URGE_TAG_NODE')}</div>" +
+                    "<ul>" +
+                    "<li><i class='iconfont icon-iddenglufanbai'></i><span>{:L('TICKET_ID')}：</span>{{ticket_no}}</li>" +
+                    "<li><i class='iconfont icon-biaoti'></i><span>{:L('TICKET_TITLE')}：</span>{{ticket_title}}</li>" +
+                    "</ul>" +
+                    "</div>" +
+                    "</div>";
+
+            layer.open(
+            {
+                title:false,
+                skin: 'urge-layer',
+                type: 1,
+                content: urgeLabelBox,
+                area: ['60%','300px'],
+                offset: ['150px'],
+                shade: false,
+                closeBtn:false,
+                shadeClose:true,
+                success: function(layero, index)
+                {
+                    $('.close').on('click',function()
+                    {
+                        layer.close(index);
+                    });
+                }
+            });
+        }
+
+    </script>
+
+</if>
+
+<if condition="$detailData['isFastReplyAuth']">
+
+    <!-- 快捷回复 -->
+    <div class="quick-shade"></div>
+
+    <div class="quick-box hidden" id="quickBox">
+
+        <div class="quick-header">
+
+            <div class="header-title">{:L('QUICK_REPLY')}</div>
+
+            <div class="quick-search">
+
+                <i class="iconfont icon-search"></i>
+
+                <input type="text" name="" id="quickSearch" placeholder="{:L('PLEASE_ENTER_KEYWORDS')}"/>
+
+                <script type="text/javascript">
+
+                    $(function()
+                    {
+                        var quickSearch = $('#quickSearch');
+
+                        quickSearch.keyup(function ()
+                        {
+                            var value = $(this).val();
+
+                            var dd = $('.quick-item dd');
+
+                            var noSearch = $('.quick-main>.no-search');
+
+                            if(value)
+                            {
+                                $('.quick-item').hide();
+
+                                dd.hide();
+
+                                var existDom = dd.filter(":contains('" + ($(this).val()) + "')");
+
+                                if(existDom.length > 0)
+                                {
+                                    noSearch.fadeOut('fast');
+
+                                    existDom.show();
+
+                                    existDom.parent('.quick-item').show();
+                                }
+                                else
+                                {
+                                    noSearch.fadeIn('fast');
+                                }
+                            }
+                            else
+                            {
+                                noSearch.fadeOut(100);
+
+                                $('.quick-item').show();
+
+                                dd.show();
+                            }
+                        });
+                    });
+
+                </script>
+
+            </div>
+
+            <a href='javascript:' class="quick-close iconfont icon-guanbi"></a>
+
+        </div>
+
+        <div class="quick-main clearfix fts0">
+
+            <div class="no-search hidden"><i class="layui-icon">&#xe69c;</i>{:L('NOT_FOUND_DATA')}</div>
+
+            <notempty name="detailData.fastReplyType">
+
+                <php>$j = 1;</php>
+
+                <volist name="detailData.fastReplyType" id="vo1" key="k">
+
+                    <php>$isParity = judgeParity($j)</php>
+
+                    <dl class="quick-item <eq name='isParity' value='2'>mr0</eq>">
+
+                        <dt>{$vo1.type_name}</dt>
+
+                        <volist name="vo1.fastreply" id="vo2">
+
+                            <dd class="clearfix">
+
+                                <i class="iconfont icon-dialog fl"></i>
+
+                                <div class="item-right ellipsis fr">
+
+                                    <p class="fts14 quick-title">{$vo2.fast_title}</p>
+
+                                    <div class="fts12 quick_content gray6">{$vo2.fast_content}</div>
+
+                                </div>
+
+                            </dd>
+
+                        </volist>
+
+                    </dl>
+
+                    <php>$j++;</php>
+                </volist>
+
+                <else />
+
+                <div class="nodata">
+
+                    <p><i class="iconfont icon-nothing fts20"></i></p>
+
+                    <p>{:L('NO_DATA')}</p>
+
+                </div>
+
+            </notempty>
+
+        </div>
+
+    </div>
+
+</if>
+
+<if condition="$ticket['delete'] eq 2 && $ticket['audit_status'] neq 2">
+
+    <if condition="!$detailData['ticketSatisfyData']">
+
+        <!-- 满意度评价 -->
+        <div class="satisfy" data-title="{:L('SATISFACTION')}">
+
+<!--            <div class="sa-title center">{:L('SATISFACTION')}</div>-->
+
+            <div class="sa-content">
+
+                <div id="satisfyConfig">
+
+                    <div id='satisfy-name' class="satisfy-name">— {:L('SATISFACTION_SERVICE')} —</div>
+
+                    <div id="satisfy-star" class="satisfy-star" style=""></div>
+
+                    <ul  id="satisfy-label" class="satisfy-label"></ul>
+
+                </div>
+
+                <div>
+
+                    <form id="satisfy-form">
+
+                        <input type="hidden" name='satisfy[satisfy_id]' id="satisfy" value="0"/>
+
+                        <input type="hidden" name='satisfy[satisfy_score]' id="satisfy-score" value="0"/>
+
+                        <textarea name='satisfy[satisfy_advise]' placeholder="{:L('ADVISE')}"></textarea>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+            <div class="sa-btn-line clearfix"><div id="submit-satisfy" class="fl sa-btn bg0">{:L('SUBMIT')}</div></div>
+
+        </div>
+
+        <script type="text/javascript">
+
+            var satisfyData = JSON.parse('{$detailData.satisfyData}');
+
+        </script>
+
+    </if>
+
+    <!-- 回复评论 -->
+    <if condition="$detailData['isCommentAuth']">
+
+        <div class="comment-panel hidden" id="comment">
+
+            <div class="comment-main">
+
+                <form action="{:U('replyComment')}" id="commentForm" class="layui-form">
+
+                    <input type="hidden" name="comment[ticket_id]" value="{:encrypt($ticket['ticket_id'],'TICKET')}"/>
+
+                    <input type="hidden" name="comment[reply_id]" id="commentReplyId"/>
+
+                    <input type="hidden" name="comment[comment_type]" id="commentType"/>
+
+                    <textarea id='commentEditor' name="comment[content]" cols="30" rows="10" placeholder="{:L('ENTER_COMMENT_CONTENT')}"></textarea>
+
+                </form>
+
+            </div>
+
+            <div class="submit-comment"><a href="javascript:" class="layui-btn">{:L('SUBMIT')}</a></div>
+
+        </div>
+
+        <script type="text/javascript">
+
+            $(function()
+            {
+                layui.use(['layedit','form'], function()
+                {
+                    var layedit = layui.layedit;
+
+                    $('.reply-comment').on('click',function()
+                    {
+                        var that = $(this);
+
+                        layer.open(
+                        {
+                            title: "{:L('COMMENT')}",
+                            type: 1,
+                            content: $('#comment'),
+                            closeBtn: 1,
+                            skin: 'comment-window',
+                            offset: ['10%'],
+                            moveOut:true,
+                            moveType: 0,
+                            area: ['500px', '312px'],
+                            success: function ()
+                            {
+                                var commentEditor = layedit.build('commentEditor',{hideTool:['strong','italic','underline','del','|','left','center','right','link',
+                                        'unlink','image','help'], height:160});
+
+                                var value = that.data('value');
+
+                                var type = that.data('type');
+
+                                if(value !== undefined && type !== undefined)
+                                {
+                                    $('#commentReplyId').val(value);
+
+                                    $('#commentType').val(type);
+                                }
+
+                                $('.submit-comment a').unbind('click').on('click',function()
+                                {
+                                    layedit.sync(commentEditor);
+
+                                    var loading = layer.load(2,{offset:['15vw']});
+
+                                    $.post("{:U('commentReply')}",$('#commentForm').serialize(),function(data)
+                                    {
+                                        if(data.errcode === 0)
+                                        {
+                                            data.isReload = 1;
+
+                                            feelDeskAlert(data.msg,data);
+                                        }
+                                        else
+                                        {
+                                            feelDeskAlert(data.msg);
+                                        }
+
+                                        layer.close(loading);
+
+                                    },'JSON')
+                                })
+                            }
+                        });
+
+                    })
+                })
+            })
+
+        </script>
+
+    </if>
+
+</if>
+
+<if condition="($detailData['isLibraryAuth'])">
+
+    <!-- 知识库 -->
+    <div class="ticket-library hidden">
+
+        <div class="library-sidebar" id="closeLibrary"><i class="iconfont icon-right"></i></div>
+
+        <div class="library-query">
+
+            <div class='library-left' id="directory-menu">
+
+                <div class="tree-left-header">{:L('LIBRARY')}</div>
+
+                <div class="dtree library-left-trees" id="directory-tree"></div>
+
+            </div>
+
+            <div class="library-right">
+
+                <div class="library-right-header">
+
+                    <div class="library-search">
+
+                        <i class="iconfont icon-search"></i>
+
+                        <input type="text" name="keyword" placeholder="{:L('SEARCH')}" autocomplete="off" id="problem-search">
+
+                        <a href="javascript:" id="search">{:L('SEARCH')}</a>
+
+                    </div>
+
+                </div>
+
+                <div class="problem-box" id="problem-box"></div>
+
+            </div>
+
+        </div>
+
+        <script type="text/javascript">
+
+            layui.config(
+                {
+                    base: '__PUBLIC__/js/layui/extends/' //配置 layui 第三方扩展组件存放的基础目录
+                }).extend({
+                dtree: 'dtree/dtree' //定义该组件模块名
+            }).use(['element','layer', 'dtree'], function()
+            {
+                var form = layui.form,layer = layui.layer, dtree = layui.dtree, $ = layui.$,element = layui.element;
+
+                var param = {},directoryId = 0,directory = {};
+
+                /**
+                * @param data {Object}
+                * @param data.directoryData {Object}
+                */
+                $.get('/library/query',{source:'ticket_detail'},function(data)
+                {
+                    dtree.render(
+                    {
+                        elem: "#directory-tree",  //绑定元素
+                        dot:false,
+                        skin: "zdy",
+                        ficon: "2",
+                        icon: ["1",'8'],
+                        initLevel:4,
+                        data: data.directoryData
+                    });
+
+                    directoryId = data.directoryId;
+
+                    directory = data.directory;
+
+                    dtree.on("node('directory-tree')" ,function(obj)
+                    {
+                        $('#problem-search').val('');
+
+                        openProblemList(obj.param);
+                    });
+                });
+
+                function openProblemList(param)
+                {
+                    var keyword = param.keyword === undefined ? '' : param.keyword;
+
+                    directoryId = param.nodeId;
+
+                    var loading = "<div class='loading'><i class='layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop'></i></div>";
+
+                    $("#problem-box").html(loading);
+
+                    $.post("{:U('library/query')}",{keyword:keyword,directoryId:directoryId},function(result)
+                    {
+                        var content = '';
+
+                        /**
+                        * @param v {Object}
+                        * @param v.problem_id {int}
+                        * @param v.create_time {string}
+                        */
+                        $.each(result.data,function(k,v)
+                        {
+                            content += "<div class='problem-item' onclick='toProblemDetail("+ v.problem_id +")'>" +
+                                "<a href='javascript:' class='ellipsis'>"+ v.title +"</a>" +
+                                "<span class='problem-date'>"+ v.create_time +"</span>" +
+                                "</div>"
+                        });
+
+                        if(content.length === 0)
+                        {
+                            content = "<div class='problem-no-data'>{:L('NO_DATA')}</div>"
+                        }
+
+                        $("#problem-box").html(content);
+
+                    },'JSON');
+                }
+
+                $('#problem-search').keyup(function(e)
+                {
+                    if(e.keyCode === 13)
+                    {
+                        var keyword = $(this).val();
+
+                        param = {keyword:keyword};
+
+                        openProblemList(param);
+                    }
+                });
+
+                $('#search').on('click',function()
+                {
+                    var keyword = $('#problem-search').val();
+
+                    param = {keyword:keyword};
+
+                    openProblemList(param);
+                });
+
+                openProblemList(param);
+            });
+
+            function toProblemDetail(id)
+            {
+                layer.open(
+                {
+                    type: 2,
+                    title: false,
+                    offset: 'r',
+                    area: ['65%','100%'],
+                    content:"/library/problem_detail.html?id="+id,
+                    shade: 0,
+                    skin: 'bounceInRight',
+                    closeBtn:0,
+                    scrollbar: true,
+                    success: function(layero, index)
+                    {
+                        var sidebar = layer.getChildFrame('body', index).find('.sidebar');
+
+                        sidebar.on('click',function()
+                        {
+                            layer.close(index);
+                        });
+
+                        if(index)
+                        {
+                            layer.close(index-1);
+                            layer.setTop(layero);
+                        }
+                    }
+                });
+            }
+
+            $('.library-base').unbind('click').on('click',function()
+            {
+                $('.ticket-library').css("display",'block').animate({right:'0'},'700');
+            });
+
+            $('#closeLibrary').unbind('click').on('click',function()
+            {
+                $('.ticket-library').animate({right:'-102%'},'500').fadeOut('fast');
+            });
+
+        </script>
+
+    </div>
+
+</if>
+
+<script type="text/javascript">
+
+    var ticketId = "{:encrypt($ticket['ticket_id'],'TICKET')}";
+
+</script>
+
+<script type="text/javascript">
+
+    $(function ()
+    {
+        var ticketTextContent = $(".ticket-textarea-content");
+
+        ticketTextContent.find('img').each(function()
+        {
+            $(this).css('margin','10px 20px 10px 0');
+        })
+    })
+
+</script>
+
+<script type="text/javascript" src="INDEX_PUBLIC_JS/reply.js?v={$Think.NOW_TIME}"></script>
+
+<script type="text/javascript" src="__PUBLIC__/js/viewer/viewer-jquery.min.js"></script>
+
+<script type="text/javascript">
+
+    /**
+    * @param v1 {Object}
+    * @param v1.userTypeName {string}
+    * @param v1.eventTypeLang {string}
+    * @param v1.create_at {int}
+    */
+    layui.use('flow', function()
+    {
+        var flow = layui.flow;
+
+        flow.load(
+        {
+            elem: '#ticketEvent',
+            isAuto: false,
+            end: "{:L('NO_MORE')}",
+            done: function (page, next)
+            {
+                var lis = [];
+
+                var str = '';
+
+                var l = 0;
+
+                $.post("{:U('Ticket/detail')}?id={:encrypt($ticket['ticket_id'],'TICKET')}&request=flow&p=" + page, function (res)
+                {
+                    var dayText = '';
+
+                    var dayClass = 'date';
+
+                    if (res.data === '')
+                    {
+                        next(lis.join(''), page < res.pages);
+                    }
+
+                    layui.each(res.data, function (key, val)
+                    {
+                        l = $("h3[data-time='" + key + "']");
+
+                        if (key === "{$nowTime}")
+                        {
+                            dayText = "{:L('TODAY')}";
+                        }
+                        else if (key === "{$yesTime}")
+                        {
+                            dayText = "{:L('YESTERDAY')}";
+                        }
+                        else
+                        {
+                            dayText = '&#xe63f;';
+
+                            dayClass = '';
+                        }
+
+                        str = "<li class='layui-timeline-item'>" +
+                                "<i class='layui-icon layui-timeline-axis " + dayClass + "'><span>" + dayText + "</span></i>" +
+                                "<div class='layui-timeline-content layui-text'>" +
+                                "<h3 class='layui-timeline-title' data-time=" + key + ">" + key + "</h3>";
+
+                        if (l.length > 0) str = '';
+
+                        layui.each(val, function (k1, v1)
+                        {
+                            str +=
+                                    "<p class='nowrap'><i class='quan'></i>"+ v1.userTypeName+
+                                    " <a href='javascript:' class='view-ticket'>" + v1.name + " </a>" + v1.eventTypeLang;
+
+                            str += "<span class='fr'>" + v1.create_at + "&nbsp;&nbsp;</span></p>";
+                        });
+
+                        if (l.length > 0)
+                        {
+                            l.parent('.layui-text').append(str);
+
+                            next('', page < res.pages);
+
+                            str = '';
+                        }
+
+                        lis.push(str);
+                    });
+
+                    if (l.length === 0)
+                    {
+                        next(lis.join(''), page < res.pages);
+                    }
+                });
+            }
+        });
+    });
+
+</script>
+
+<link href="__PUBLIC__/js/at/dist/css/jquery.atwho.css" rel="stylesheet">
+
+<script src="__PUBLIC__/js/at/jquery.caret.js"></script>
+
+<script src="__PUBLIC__/js/at/dist/js/jquery.atwho.js"></script>
+
+<script type="text/javascript">
+
+    var members = JSON.parse('{$detailData.jsonMembers}');
+
+    var ccJsonMembers = JSON.parse('{$detailData.ccJsonMembers}');
+
+    $(function()
+    {
+        $.each($('.leaguer'),function()
+        {
+            var value = $(this).data('value');
+
+            var name = $(this).data('name');
+
+            $(this).on('click',function(e)
+            {
+                var ccContent = '<span class="cc-member">@<span style="vertical-align: middle">'+name+'</span></span>' +
+                        '<input type="hidden" name="ticket[cc_id][]" value="'+value+'">';
+
+                updateCcText(value,ccContent,e);
+            })
+        });
+
+        $.each($('.reply-content .atwho-inserted'),function()
+        {
+            $(this).css('cursor','pointer');
+
+            var ccId = $(this).find('input').val();
+
+            $(this).on('click',function(e)
+            {
+                var ccContent = $(this).html();
+
+                updateCcText(ccId,ccContent,e);
+            })
+        });
+
+        $.each($('.reply-content .content img'),function()
+        {
+            var fileExt = (/[.]/.exec($(this).attr('src'))) ? /[^.]+$/.exec($(this).attr('src').toLowerCase()) : '';
+
+            if(fileExt !== 'gif')
+            {
+                $(this).width('240');
+
+                $(this).height('135');
+            }
+
+            var _src = $(this).attr('src').replace("?imageMogr2/auto-orient/thumbnail/240x135!/format/png/blur/1x0/quality/100|imageslim",'');
+
+            $(this).removeAttr('alt').addClass('reply-image');
+
+            $(this).attr('data-original',_src);
+        });
+
+        $('.comment-more').on('click',function()
+        {
+            $(this).siblings('.comment-item:gt(2)').slideToggle('fast');
+
+            $(this).find('i').toggleClass('icon-upward');
+        });
+
+//		  判断抄送人是否存在，并添加到文本框
+        function updateCcText(id,content,e)
+        {
+            if(!$('.team-reply-input').is(':hidden'))
+            {
+//                   团队回复框伸展
+                $('.team-reply-input').hide();
+
+                $("#team-reply-textarea").slideDown('fast');
+
+                $(".ticket-detail-content").css('padding-bottom','300px');
+
+                e.stopPropagation();
+
+                $(".team-textarea-hide").on('click',function()
+                {
+                    $("#team-reply-textarea").slideUp('fast',function()
+                    {
+                        $(".team-reply-input").show();
+
+                        $(".ticket-detail-content").css('padding-bottom','60px');
+                    });
+                });
+            }
+
+//            判断文本域中抄送人是否存在
+            var exist = 0;
+
+            var textBody = $("#LAY_layedit_3").contents().find('body');
+
+            $.each(textBody.find('.atwho-inserted'), function ()
+            {
+                var user_id = $(this).find("input").val();
+
+                if (user_id === id) exist = 1;
+            });
+
+            if(exist === 1)
+            {
+                return false;
+            }
+            else
+            {
+                textBody.append('<span class="atwho-inserted" data-atwho-at-query="@" style="cursor: pointer;">'+content+'</span>&zwj;&nbsp;');
+            }
+        }
+    });
+
+    $('body').find('#closeTicketDetail').click(function()
+    {
+        window.parent.postMessage('closeDetail','*');
+    });
+
+    window.addEventListener('message', function(e)
+    {
+        if(e.data)
+        {
+            window.formCustomer = 1;
+        }
+    }, false)
+
+</script>

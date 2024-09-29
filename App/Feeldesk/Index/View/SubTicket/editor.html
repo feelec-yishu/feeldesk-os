@@ -1,0 +1,183 @@
+<include file="Public/header" />
+
+<div class="feeldesk-form ticket-form edit-ticket" style="height:calc(100% - 10px)">
+
+    <form action="{:U('SubTicket/editor',['id'=>encrypt($ticket['ticket_id'],'SUB_TICKET')])}" class="layui-form" method="post" enctype="multipart/form-data">
+
+        <div class="form-content pt20">
+
+            <div class="form-item">
+
+                <!-- 主题 -->
+                <div class="layui-form-item">
+
+                    <label class="layui-form-label"><span class="red">*</span> {:L('TICKET_TITLE')}</label>
+
+                    <div class="layui-input-inline">
+
+                        <input type="text" name="ticket[title]" value='{$ticket.title}' placeholder="{:L('ENTER_SUB_TICKET_TITLE')}" class="layui-input">
+
+                    </div>
+
+                </div>
+
+                <div class="layui-form-item">
+
+                    <label class="layui-form-label">{:L('TICKET_CONTENT')}</label>
+
+                    <div class="layui-input-inline">
+
+                        <textarea class="layui-textarea layui-hide ticket-textarea" name="ticket[content]" id="ticketEditor1">{$ticket.content}</textarea>
+
+                    </div>
+
+                </div>
+
+                <!-- 指定处理人 -->
+                <div class="layui-form-item">
+
+                    <label class="layui-form-label">{:L('HANDLER')}</label>
+
+                    <div class="layui-input-inline layui-form" lay-filter="handle-person">
+
+                        <select name="ticket[process_id]" lay-search id="handler">
+
+                            <option value="">{:L('SELECT_DISPOSE')}</option>
+
+                            <volist name="ticket.members" id="vo">
+
+                                <option value="{$vo.member_id}" <eq name="vo.member_id" value="$ticket['process_id']">selected</eq>>{$vo.name}</option>
+
+                            </volist>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <!-- 图片上传 -->
+                <div class="layui-form-item relative">
+
+                    <label class="layui-form-label"></label>
+
+                    <div class="layui-input-inline flex flex-wrap mr0" id="imageNames">
+
+                        <volist name="ticket.photo" id="vo">
+
+                            <php>$m = ($i)%3;</php>
+
+                            <div class="layui-upload-drag <eq name='m' value='0'>mr0</eq>">
+
+                                <img src="{$vo}" alt="" />
+
+                                <a href="javascript:" class="image-cancel" onclick="editTicketDeleteImage(this);" data-name="{:getImageName('http://'.$ticket['qiniu_domain'].'/',$vo)}" title="{:L('DELETE_PICTURE')}">X</a>
+
+                                <input type="hidden" name="photo[]" value="{$vo}">
+
+                            </div>
+
+                        </volist>
+
+                        <div class="layui-upload-drag uploadImg mr0">
+
+                            <div>
+
+                                <i class="layui-icon"></i>
+
+                                <p>{:L('UPLOAD_PICTURES')}</p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- 附件上传 -->
+                <div class="layui-form-item relative">
+
+                    <label class="layui-form-label">{:L('UPLOAD_ATTACHMENTS')}</label>
+
+                    <div class="layui-input-inline">
+
+                        <button type="button" class="layui-btn layui-btn-primary" id="uploadFile"><i class="layui-icon"></i>{:L('UPLOAD_ATTACHMENTS')}</button>
+
+                        <ul id="attachments" class="attach-item mt10">
+
+                            <volist name="ticket.attachments" id="vo">
+
+                                <li>
+
+                                    <i class="iconfont icon-fujian"></i>
+
+                                    <span>{$vo['file_name']}</span>
+
+                                    <span class="iconfont icon-close2 closed cursor" data-name="{$vo['save_name']}" onclick="editTicketDeleteFile(this);"></span>
+
+                                    <input type="hidden" name="file[saves][]" value="{$vo['save_name']}">
+
+                                    <input type="hidden" name="file[names][]" value="{$vo['file_name']}">
+
+                                    <input type="hidden" name="file[sizes][]" value="{$vo['file_size']}">
+
+                                    <input type="hidden" name="file[types][]" value="{$vo['file_type']}">
+
+                                    <input type="hidden" name="file[links][]" value="{$vo['file_link']}">
+
+                                </li>
+
+                            </volist>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="form-submit">
+
+                <div class="layui-form-item">
+
+                    <div class="layui-input-inline">
+
+                        <a href="javascript:" class="layui-btn layui-btn-normal" id="submitForm">{:L('SUBMIT')}</a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+    <script type="text/javascript">
+
+        function editTicketDeleteImage(obj)
+        {
+            var imageName = $(obj).data('name');
+
+            $('#imageNames').append("<input type='hidden' name='delImage[]' value="+imageName+">");
+
+            $(obj).parent().remove();
+        }
+
+        function editTicketDeleteFile(obj)
+        {
+            var fileName =$(obj).data('name');
+
+            $('#attachments').append("<input type='hidden' name='delFile[]' value='"+fileName+"'>");
+
+            $(obj).parent().remove();
+        }
+
+    </script>
+
+</div>
+
+<include file="Public:language" />
